@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>landing1</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Reset Default Browser */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; 
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f7f7f7; 
+        }
+          /* Navbar */
+        header {
+            height: 50px; 
+            background-color: #4a2c18; /*mengganti warna background navbar */
+            color: #f7f7f7; /* mengganti warna teks navbar */
+            padding: 0 15px;
+            display: flex;
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+            z-index: 1000;
+        }
+
+
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 35px;
+            left: -20px;
+            background: #724636;
+            border : none;
+            width: 150px; /*untuk mengecilkan lebar kotak putih*/
+            padding: 7px; /*untuk kotak luar yang coklat*/
+            display: none;
+            flex-direction: column;
+            border-radius: 8px;
+            gap: 0px;
+        }
+
+        .dropdown-inner {
+            background: #ffffff;
+            border-radius: 8px ;
+            border: 2px solid #724636;
+            padding: 2px 0; /*untuk mengecilkan tinggi kotak putih*/
+            overflow: hidden;
+        }
+
+        .dropdown-inner a {
+            color: #000;
+            padding: 2px 0;
+            font-size: 14px;
+            display: block;
+            text-align: center;
+        }
+
+        .dropdown-separator {
+            height: 8px;
+            background: #724636;
+            margin: 0;
+        }
+
+
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo-img{
+            height:40px;
+            width: auto;
+        }
+        .logo-text-img{
+            height: 70px;
+            width: auto;
+            margin-left: -12px;
+            position: relative;
+            top: -2px;
+            
+        }
+        .logo i {
+            margin-right: 8px;
+            font-size: 1.4em;
+        }
+        nav ul {
+            display: flex; 
+            list-style: none; 
+            padding: 0;
+        }
+        nav ul li {
+            margin-left: 20px; 
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: inherit;
+            font-size: 0.95em; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        nav ul li a:hover {
+            color: #6d4c41;
+        }        
+        .artikel-link span {
+             margin: 0 4px;
+        }
+        .user-icon i {
+            font-size: 1.6em;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+        .user-icon i:hover {
+            color: #6d4c41;
+        } 
+/* hero */
+        .hero-section {
+            display: flex;
+            max-width: 1200px; 
+            margin: 20px auto;
+            padding: 20px 50px; 
+            gap: 50px; 
+            align-items: center; 
+            background-image: url("pesawat.png");
+            background-repeat: no-repeat;
+            background-position: 212px 380px;
+            background-size: 410px auto;
+        }
+        .hero-text {
+            flex: 1; 
+            max-width: 50%; 
+        }
+        .hero-text h1 {
+            font-size: 2.7em; 
+            color: #000;
+            margin-bottom: 30px;
+            line-height: 1.1;
+            font-weight: 800;
+            text-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);;
+        }   
+        .hero-text p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .hero-button {
+            background-color: #4a2c18; 
+            color: white;
+            padding: 10px 25px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .hero-button:hover {
+            background-color: #a3826f;
+        }
+        .image-container {
+            flex: 1; 
+            display: flex;
+            gap: 15px; 
+            position: relative; 
+            padding: 20px;
+            background-color: #f7f7f7; 
+        }
+        .left-panel { flex: 1; }
+        .main-image {
+            width: 100%; 
+            height: 350px; 
+            object-fit: cover; 
+            border-radius: 20px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 70px auto;
+        }
+        .right-panel {
+            flex: 1; 
+            display: flex;
+            flex-direction: column; 
+            gap: 15px; 
+        }
+        .top-image, .bottom-image {
+            width: 100%;
+            height: 250px; 
+            object-fit: cover;
+            border-radius: 20px; 
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+        }
+        /* rekomendasi artikel*/
+        .rekomendasi-section { 
+            padding: 20px 50px; 
+            margin-top: 50px; 
+        }
+        .rekomendasi-section h2 {
+            margin-bottom: 2px;
+            color: black;
+        }
+        .rekomendasi-section p {
+            position: relative;
+            top: -10px;
+            color: #666;
+        }
+        
+        .cards-container {
+            display: flex;       
+            overflow-x: scroll;  
+            overflow-y: hidden; 
+            padding-bottom: 20px; 
+            flex-wrap: nowrap;   
+            scroll-behavior: smooth; 
+        }
+
+        .cards-container::-webkit-scrollbar {
+            display: none; 
+        }
+        .card {
+            flex: 0 0 250px; 
+            margin-right: 20px; 
+            padding: 15px;
+            background-color: #4a2c18;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s; 
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 345px; 
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .card h3 {
+            font-size: 1.1em;
+            margin: 10px 0 5px;
+            color: #f0f0f0;
+        }
+
+
+        /*bintang*/
+        .rating-stars {
+            font-size: 1.5rem; /* Ukuran font disesuaikan untuk bintang Unicode */
+            color: #fbbf24; 
+            margin-bottom: 0.75rem;
+            letter-spacing: 2px;
+            position: relative; /*untuk menggeser bintang */
+            top: -10px; /*untuk menggeser bintang */
+        
+        }
+        
+        /* Bintang yang tidak terisi (Unicode Bintang Kosong) - Tema Gelap */
+        .rating-stars .unfilled-star {
+            color: rgba(255, 255, 255, 0.5); 
+        }
+
+        .card button {
+            padding: 10px 20px;
+            background-color: #f7f7f7; 
+            color: black;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-weight: bold;
+            position: relative; 
+            top: -10px; 
+
+        }
+        /*rekomendasi biografi tokoh*/
+        .rekomendasi-section { 
+            padding: 20px 50px; 
+            margin-top: 50px; 
+        }
+        .rekomendasi-section h2 {
+            margin-bottom: 2px;
+            color: black;
+        }
+        .rekomendasi-section p {
+            margin-top: 2px;
+            color: #666;
+        }
+        
+        .cards-container {
+            display: flex;       
+            overflow-x: scroll;  /*ini untuk scroll*/
+            overflow-y: hidden; /*ini untuk bisa disembunyikan*/
+            padding-bottom: 20px; 
+            flex-wrap: nowrap;   
+            scroll-behavior: smooth; 
+        }
+
+        .cards-container::-webkit-scrollbar {
+            display: none; 
+        }
+        .card {
+            flex: 0 0 250px; 
+            margin-right: 20px; 
+            padding: 15px;
+            background-color: #4a2c18;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s; 
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card img {
+            width: 100%;
+            height: 345px; 
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .card h3 {
+            font-size: 1.1em;
+            margin: 10px 0 5px;
+            color: #f0f0f0;
+        }
+
+        
+
+        .card button {
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 10px 20px;
+            background-color: #f7f7f7; 
+            color: black;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.2s;
+            position: relative; 
+            top: -5px;
+        }
+        
+        .card button:hover {
+            background-color: #e0e0e0;
+            transform: scale(1.02);
+        }
+
+        .card button img {
+            width: 18px;    
+            height: 18px;   
+            margin-left: 0px; /* Jarak antara teks dan gambar */
+            object-fit: contain;
+        
+        }
+
+        .container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 50px;
+      background-color: white;
+      padding: 50px;
+      border-radius: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-width: 1000;
+      margin: 40px auto;
+    }
+
+    .images {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .images img {
+      width: 250px;
+      height: 180px;
+      object-fit: cover;
+      
+    }
+
+    /* sudut */
+    .img1 {
+      border-top-left-radius: 60px;
+      box-shadow: -13px -15px 0px #4a2c18;
+    }
+
+    .img2 {
+      border-top-right-radius: 60px;
+    }
+
+    .img3 {
+      border-bottom-left-radius: 60px;
+    }
+
+    .img4 {
+      border-bottom-right-radius: 60px;
+      box-shadow: 13px 15px 0px #4a2c18;
+    }
+
+    .text {
+      max-width: 450px;
+    }
+
+    .text h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    .text ul {
+      list-style-type: disc;
+      padding-left: 20px;
+      color: #444;
+      line-height: 1.6;
+    }
+
+
+    .footer {
+            background-color: #4a2c18; 
+            color: #fff; 
+            padding: 40px 20px; 
+            font-size: 14px;
+        }
+
+        .footer-container {
+            max-width: 1200px; 
+            margin: 0 auto; 
+            display: grid;
+            grid-template-columns: 1.2fr 2.5fr 1fr; 
+            gap: 20px; 
+            align-items: flex-start;
+        }
+        .footer-kolom {
+            padding: 0 10px;
+        }
+        
+        /* logo info*/
+        .logo-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo-title img {
+            width: 40px; 
+            height: 40px;
+            margin-right: 8px;
+             
+        }
+
+        .logo-title h3 {
+            color: white;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .logo-info p {
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+
+        .sosial-media-wrapper {
+            margin-top: 10px;
+        }
+        
+        .sosial-media {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .sosial-media a {
+            color: #fff; 
+            font-size: 24px;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+        
+        .sosial-media-wrapper span {
+            font-size: 14px;
+            color: inherit;
+        }
+        
+        /* menu tentang kita*/
+        
+        .middle-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /*Beranda, Artikel*/
+        .navigasi-horizontal {
+            display: flex;
+            justify-content: space-between; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap;
+            color: white;
+        }
+        
+        .navigasi-horizontal a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            padding-right: 20px; 
+        }
+        
+        /* Judul Tentang Kita" */
+        .middle-section h4 {
+            color: white;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        /*kolom*/
+        .kontak .item-kontak {
+            margin-bottom: 15px;
+        }
+        
+        .kontak .item-kontak p {
+            margin: 2px 0;
+        }
+        
+        .kontak .item-kontak p:first-child {
+            font-weight: bold;
+            margin-bottom: 2px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        /*Ikon Telepon & Email */
+        .kontak .item-kontak i {
+            margin-right: 8px;
+            font-size: 18px;
+            color: #fff;
+        }
+        @media (max-width: 768px) {
+            .footer-container {
+                grid-template-columns: 1fr; 
+                gap: 30px;
+            }
+            .navigasi-horizontal {
+                flex-direction: column;
+                margin-bottom: 15px;
+            }
+            .navigasi-horizontal a {
+                margin-bottom: 10px;
+                padding-right: 0;
+            }
+        }
+
+
+       /*RESPONSIVE UKURAN */
+        @media (max-width: 768px) {
+            /* Layout berubah jadi 1 kolom */
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .left {
+                height: 350px;
+            }
+
+            /* Foto pindah ke tengah */
+            .photo-box {
+                top: 55%;
+                left: 50%;
+                width: 260px;
+                transform: translate(-50%, -50%);
+            }
+
+            .right {
+                padding: 30px 20px;
+            }
+
+            h2 {
+                font-size: 26px;
+            }
+        }
+
+        /* RESPONSIVE HP KECIL */
+        @media (max-width: 480px) {
+            .photo-box {
+                width: 220px;
+            }
+
+            p {
+                font-size: 14px;
+            }
+        }
+
+        
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logobenar.png"
+            alt="logo PJBL" class="logo-img">
+            <img src="sejput.png"
+            alt="namaweb text" class="logo-text-img">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="#">Beranda</a></li>
+                <li class="artikel-link">
+                    <a href="#">
+                        Artikel 
+                    <span class="dropdown-icon">
+                        <i class="fas fa-caret-down">
+                        </i></span></a></li> 
+                <li><a href="#">Favorit</a></li>
+                <li><a href="#">Ulasan</a></li>
+            </ul>
+        </nav>
+        <div class="user-icon">
+            <i class="fas fa-user-circle"></i>
+        </div>
+    </header>
+    <div class="hero-section">
+        <div class="hero-text">
+            <h1>EXPLORE SEJARAH BANGSA INDONESIA </h1>
+            <p>Explore Sejarah Indonesia, 
+                menghadirkan artikel-artikel menarik yang mengajak Anda 
+                menyelami kisah-kisah epik bangsa. 
+                Temukan peristiwa bersejarah dan tokoh penting yang 
+                membentuk Indonesia seperti yang kita kenal hari ini.</p>
+            <button class="hero-button">Lihat Lebih Banyak</button>
+        </div>
+        <div class="image-container">
+            <div class="left-panel">
+                <img src="candi1.jpg" alt="pura" class="main-image">
+            </div>
+            <div class="right-panel">
+                <img src="candi2.jpg" alt="Candi Borobudur" class="top-image">
+                <img src="candi3.jpg" alt="Candi Prambanan" class="bottom-image">
+            </div>
+            
+        </div>
+    </div>
+    <section class="rekomendasi-section">
+        <h2>Rekomendasi Artikel</h2>
+        <p>Temukan lebih banyak hal menarik!</p>
+
+        <div class="cards-container">
+            
+            <div class="card">
+                <img src="cover1.jpg" alt="Proklamasi Kemerdekaan">
+                <h3>Proklamasi Kemerdekaan</h3>
+                <div class="rating-stars">
+                         ★★★★★<span class="unfilled-star"></span>   
+                        </div>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+            <div class="card">
+                <img src="cover2.jpg" alt="Bandung Lautan Api">
+                <h3>Bandung Lautan Api</h3>
+                <div class="rating-stars">
+                          ★★★★<span class="unfilled-star">★</span>   
+                        </div>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+            <div class="card">
+                <img src="cover3.jpg" alt="G30S/PKI">
+                <h3>Peristiwa G30S/PKI</h3>
+                <div class="rating-stars">
+                          ★★★★★<span class="unfilled-star"></span>     
+                        </div>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+            <div class="card">
+                <img src="cover4.jpg" alt="Sumpah Pemuda">
+                <h3>Sumpah Pemuda</h3>
+                <div class="rating-stars">
+                            ★★★★★<span class="unfilled-star"></span>
+                        </div>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+
+            <div class="card">
+                <img src="cover5.jpg" alt="pertempuran ambarawa">
+                <h3>Pertempuran Ambarawa</h3>
+                <div class="rating-stars">
+                            ★★★★<span class="unfilled-star">★</span>
+                        </div>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+            
+        </div>
+    </section>
+
+    <section class="rekomendasi-section">
+        <h2>Rekomendasi Biografi Tokoh</h2>
+        <p>Temukan lebih banyak hal menarik!</p>
+
+        <div class="cards-container">
+            
+            <div class="card">
+                <img src="tokoh1.jpg" alt="Bung Tomo">
+                <h3>Bung Tomo</h3>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+            <div class="card">
+                <img src="tokoh2.jpg" alt="Jendral Soedirman">
+                <h3>Jenderal Soedirman</h3>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+            <div class="card">
+                <img src="tokoh3.jpg" alt="Soekarno">
+                <h3>Ir.Sukarno</h3>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+            <div class="card">
+                <img src="tokoh4.jpg" alt="Mohammad hatta">
+                <h3>Mohammad Hatta</h3>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+
+            <div class="card">
+                <img src="tokoh5.jpg" alt="Artikel Tambahan 5">
+                <h3>Dr.Soetomo</h3>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+            <div class="card">
+                <img src="tokoh6.jpg" alt="Artikel Tambahan 6">
+                <h3>Ahmad Yani</h3>
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </div>
+            
+        </div>
+    </section>
+
+     <div class="container">
+    <div class="images">
+      <img src="bg1.png" alt="Foto 1" class="img1">
+      <img src="bg2.png" alt="Foto 2" class="img2">
+      <img src="bg3.png" alt="Foto 3" class="img3">
+      <img src="bg1.1.jpg" alt="Foto 4" class="img4">
+    </div>
+
+    <div class="text">
+      <h2>Mengapa Memilih Kami?</h2>
+      <ul>
+        <li>Penjelasan dibuat menarik dan mudah dipahami untuk semua usia</li>
+        <li>Gratis & mudah diakses, bisa dibuka kapan saja tanpa biaya</li>
+        <li>Membantu mengenal sejarah Indonesia secara mudah</li>
+        <li>Menyajikan informasi sejarah Indonesia yang terpercaya</li>
+        <li>Desain interaktif sehingga belajar sejarah terasa seru, bukan membosankan</li>
+      </ul>
+    </div>
+  </div>
+
+<div class="footer">
+        <div class="footer-container">
+            
+            <div class="footer-kolom logo-info">
+                <div class="logo-title">
+                    <img src="logobenar.png" alt="Logo Sejiwa"> 
+                    <h3>Sejiwa.id</h3>
+                </div>
+                <p>Sejarah Indonesia: Warisan berharga, Sumber Pengetahuan</p>
+                <div class="sosial-media-wrapper">
+                    <div class="sosial-media">
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
+                    <span>Ikuti Kami</span>
+                </div>
+            </div>
+            
+            <div class="footer-kolom middle-section">
+                <div class="navigasi-horizontal">
+                    <a href="#">Beranda</a>
+                    <a href="#">Artikel</a>
+                    <a href="#">Favorit</a>
+                    <a href="#">Ulasan</a>
+                </div>
+
+                <div class="tentang-kita-container">
+                    <h4>Tentang Kita</h4>
+                    <p>Sejiwa.id adalah proyek kami untuk mengeksplorasi sejarah Indonesia dan berbagai cerita yang berharga dari masa lalu.</p>
+                </div>
+            </div>
+            
+            <div class="footer-kolom kontak">
+                <div class="item-kontak">
+                    <p><i class="fas fa-envelope"></i> Email:</p> 
+                    <p>blaabla@gmail.com</p>
+                    <p>uwthh@gmail.com</p>
+                </div>
+                <div class="item-kontak">
+                    <p><i class="fas fa-phone"></i> Call:</p> 
+                    <p>(480) 555-0103</p>
+                    <p>(406) 555-0120</p>
+                </div>
+            </div>
+            <script>
+        function toggleDropdown() {
+            const menu = document.getElementById('dropdown-menu');
+            menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+        }
+
+        document.addEventListener("click", function (e) {
+            const menu = document.getElementById('dropdown-menu');
+            const dropdown = document.querySelector(".dropdown");
+
+            if (!dropdown.contains(e.target)) {
+                menu.style.display = "none";
+            }
+        });
+    </script>
+            
+        </div>
+    </div>
+</body>
+</html>

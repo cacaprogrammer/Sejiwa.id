@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <title>Register</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 12px;
+    }
+
+    /* ====================== CONTAINER ====================== */
+    .container {
+      width: 1000px;
+      background: #ffffff;
+      border-radius: 20px;
+      display: flex;
+      overflow: hidden;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    }
+
+    /* ================= PANEL KIRI - GAMBAR SELALU UTUH ================= */
+    .left {
+      flex: 0.6;
+      background-color: #ffffff;
+      background-image: url("login1.png");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;    /* ← GAMBAR SELALU UTUH */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 70px;
+      min-height: 350px;
+    }
+
+    /* ================= PANEL KANAN ================= */
+    .right {
+      flex: 1.4;
+      padding: 55px 75px;
+    }
+
+    /* ================= WELCOME ================= */
+    .welcome {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 22px;
+    }
+
+    .welcome img {
+      width: 35px;
+    }
+
+    /* ================= LABEL ================= */
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      display: block;
+      color: #3a2a23;
+    }
+
+    /* ================= INPUT ================= */
+    .input-group {
+      width: 100%;
+      background-color: #e5c8bd;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      margin-bottom: 12px;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 13px;
+    }
+
+    /* ================= CHECKBOX ================= */
+    .checkbox {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      margin: 6px 0 14px;
+    }
+
+    /* ================= BUTTON ================= */
+    .btn {
+      width: 100%;
+      height: 40px;
+      background-color: #603a2b;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .btn:hover {
+      opacity: .9;
+      transform: scale(1.01);
+    }
+
+    /* ================= GARIS PEMBATAS ================= */
+    .divider {
+      margin: 18px 0;
+      text-align: center;
+      font-size: 12px;
+      position: relative;
+      color: #777;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 38%;
+      border-top: 1px solid #b9b9b9;
+    }
+
+    .divider::before { left: 0; }
+    .divider::after  { right: 0; }
+
+    /* ================= FACEBOOK BUTTON ================= */
+    .facebook-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 5px;
+      cursor: pointer;
+    }
+
+    .facebook-btn img {
+      width: 18px;
+    }
+
+    /* ================= RESPONSIVE ================= */
+
+    /* Tablet */
+    @media(max-width: 900px) {
+      .container {
+        width: 95%;
+        flex-direction: column;
+      }
+
+      .left {
+        height: 260px;
+        padding: 20px;
+        background-size: contain; /* tetap utuh */
+      }
+
+      .right {
+        width: 100%;
+        padding: 30px 35px;
+      }
+    }
+
+    /* Mobile sedang */
+    @media(max-width: 600px) {
+      .left {
+        height: 210px;
+        background-size: contain;
+      }
+
+      .right {
+        padding: 25px 25px;
+      }
+
+      .welcome {
+        font-size: 15px;
+      }
+
+      .welcome img {
+        width: 30px;
+      }
+    }
+
+    /* Mobile kecil */
+    @media(max-width: 420px) {
+      .left {
+        height: 180px;
+        background-size: contain;
+      }
+
+      .right {
+        padding: 20px 18px;
+      }
+
+      .input-group {
+        height: 38px;
+      }
+
+      .btn {
+        height: 38px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="left"></div>
+
+    <div class="right">
+
+      <div class="welcome">
+        <img src="ri_admin-fill.png">
+        <span>Selamat Datang!</span>
+      </div>
+
+      <form>
+        <label>Nama Lengkap</label>
+        <div class="input-group"><input type="text" placeholder="Nama Lengkap"></div>
+
+        <label>Email</label>
+        <div class="input-group"><input type="email" placeholder="Masukkan Email"></div>
+
+        <label>Username</label>
+        <div class="input-group"><input type="text" placeholder="Masukan Username"></div>
+
+        <label>Password</label>
+        <div class="input-group"><input type="password" placeholder="Password"></div>
+
+        <div class="checkbox">
+          <input type="checkbox"> <span>Ingatkan Saya</span>
+        </div>
+
+        
+         <a href="loginpage.html" class="btn" style="text-decoration: none; display: block; text-align: center; 
+        display: block; padding: 10px 0;">
+        Daftar</a>
+
+
+        <div class="divider">Atau</div>
+
+        <div class="facebook-btn">
+          <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/facebook/facebook-original.svg">
+          Masuk Dengan Facebook
+        </div>
+
+      </form>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

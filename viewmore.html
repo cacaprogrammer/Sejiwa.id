@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>viewmore</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">  
+    <style>  
+        /* Reset Default Browser */  
+        * {  
+            margin: 0;  
+            padding: 0;  
+            box-sizing: border-box;   
+        }  
+        body {  
+            font-family: Arial, sans-serif;  
+            line-height: 1.6;  
+            background-color: #f7f7f7;   
+        }  
+        /* Navbar */  
+        header {  
+            height: 50px;   
+            background-color: #4a2c18;   
+            color: #fff;   
+            padding: 0 15px;  
+            display: flex;  
+            justify-content: space-between;   
+            align-items: center;   
+            position: sticky;   
+            top: 0;  
+            left: 0;  
+            width: 100%;  
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);   
+            z-index: 1000;  
+        }  
+          
+        /* Dropdown Desktop */  
+        .dropdown {  
+            position: relative;  
+        }  
+
+        .dropdown-menu {  
+            position: absolute;  
+            top: 35px;  
+            left: -20px;  
+            background: #724636;  
+            border : none;  
+            width: 150px; /*untuk mengecilkan lebar kotak putih*/  
+            padding: 7px; /*untuk kotak luar yang coklat*/  
+            display: none;  
+            flex-direction: column;  
+            border-radius: 8px;  
+            gap: 0px;  
+        }  
+
+        .dropdown-inner {  
+            background: #ffffff;  
+            border-radius: 8px ;  
+            border: 2px solid #724636;  
+            padding: 2px 0; /*untuk mengecilkan tinggi kotak putih*/  
+            overflow: hidden;  
+        }  
+
+        .dropdown-inner a {  
+            color: #000;  
+            padding: 2px 0;  
+            font-size: 14px;  
+            display: block;  
+            text-align: center;  
+        }  
+
+        .dropdown-separator {  
+            height: 8px;  
+            background: #724636;  
+            margin: 0;  
+        }  
+    
+        .logo {  
+            display: flex;  
+            align-items: center;  
+        }  
+        .logo-img{  
+            height:40px;  
+            width: auto;  
+        }  
+        .logo-text-img{  
+            height: 70px;  
+            width: auto;  
+            margin-left: -12px;  
+            position: relative;  
+            top: -2px;  
+        }  
+        
+        /* Navbar Desktop Styling */  
+        nav ul {  
+            display: flex;   
+            list-style: none;   
+            padding: 0;  
+        }  
+        nav ul li {  
+            margin-left: 20px;   
+        }  
+        nav ul li a {  
+            text-decoration: none;  
+            color: inherit;  
+            font-size: 0.95em;   
+            font-weight: bold;  
+            transition: 0.3s;  
+        }  
+        nav ul li a:hover {  
+            color: #a3826f;  
+        }          
+        .artikel-link span {  
+             margin: 0 4px;  
+        }  
+        .user-icon i {  
+            font-size: 1.6em;  
+            cursor: pointer;  
+            margin-right: 15px;  
+        }  
+        .user-icon a {  
+            color: #fff;  
+        }  
+        .user-icon i:hover {  
+            color: #a3826f;  
+        }   
+
+        /* Hamburger Menu & Sidebar Styling (Mobile) - INTEGRASI DARI LANDING PAGE */  
+        .hamburger-menu {  
+            display: none; /* Default: hidden on desktop */  
+            background: none;  
+            border: none;  
+            color: #f7f7f7;  
+            font-size: 1.5em;  
+            cursor: pointer;  
+            padding: 5px;  
+            margin-right: 10px;  
+        }  
+
+        .sidebar {  
+            height: 100%;  
+            width: 0; /* Awalnya tersembunyi */  
+            position: fixed;  
+            z-index: 1001;  
+            top: 0;  
+            right: 0;  
+            background-color: #4a2c18;  
+            overflow-x: hidden;  
+            transition: 0.3s;  
+            padding-top: 60px;  
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.4);  
+        }  
+
+        .sidebar a {  
+            padding: 15px 25px;  
+            text-decoration: none;  
+            font-size: 18px;  
+            color: #f7f7f7;  
+            display: block;  
+            transition: 0.3s;  
+        }  
+
+        .sidebar a:hover {  
+            background-color: #6d4c41;  
+        }  
+          
+        .sidebar .close-btn {  
+            position: absolute;  
+            top: 0;  
+            right: 15px;  
+            font-size: 36px;  
+            margin-left: 50px;  
+            color: #f7f7f7;  
+            border: none;  
+            background: none;  
+            cursor: pointer;  
+        }  
+
+        .sidebar-user-icon {  
+            padding: 20px 25px;  
+            border-bottom: 1px solid #6d4c41;  
+            margin-bottom: 10px;  
+        }  
+
+        .sidebar-user-icon a {  
+            font-size: 20px;  
+            font-weight: bold;  
+        }  
+
+        .sidebar-user-icon i {  
+            margin-right: 10px;  
+        }  
+          
+        /* Dropdown Sidebar */  
+        .dropdown-menu-sidebar {  
+            display: none;  
+            background-color: #724636;  
+            padding: 5px 0;  
+        }  
+
+        .dropdown-menu-sidebar .dropdown-inner {  
+            background: #ffffff;  
+            border-radius: 8px;  
+            border: 2px solid #724636;  
+            padding: 2px 0;   
+            margin: 5px 15px;  
+        }  
+
+        .dropdown-menu-sidebar .dropdown-inner a {  
+            color: #000;  
+            padding: 5px 10px;  
+            font-size: 14px;  
+            text-align: center;  
+        }  
+
+        .dropdown-menu-sidebar .dropdown-separator {  
+            height: 5px;  
+            background: #724636;  
+            margin: 0 15px;  
+        }  
+
+
+        /*pencarian*/  
+        .search-container {  
+            display: flex;  
+            justify-content: center;  
+            padding: 20px 0;   
+            margin-bottom: 20px;   
+            position: relative;  
+            z-index: 10;  
+        }  
+
+        .search-box {  
+            display: flex;  
+            align-items: center;  
+            background-color: #4A2C18;   
+            border-radius: 50px;   
+            padding: 10px 20px;  
+            width: 100%;  
+            max-width: 500px;  
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);  
+            z-index: 12;  
+            position: relative;  
+        }  
+
+       .search-box img {  
+        width: 20px;  
+        height: 20px;    
+        margin-right: 10px;  
+       }  
+
+        .search-input {  
+            flex-grow: 1;  
+            border: none;  
+            background: #4A2C18;  
+            color: #ffff;  
+            font-size: 1em;  
+            outline: none;  
+            margin-left: 6px;  
+        }  
+
+        .search-input::placeholder {  
+            color: #d7ccc8;  
+        }  
+
+          
+        
+        .history-dropdown {  
+            position: absolute;  
+            top: 90%;   
+            left: 50%;   
+            transform: translateX(-50%);   
+            width: 100%;  
+            max-width: 500px; /* Ikuti lebar maksimum search-box */  
+            background-color: #4A2C18;   
+            border-bottom-left-radius: 20px;  
+            border-bottom-right-radius: 20px;  
+            padding-top: 20px;   
+            padding-bottom: 10px;  
+            margin-top: -30px;   
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);  
+            z-index: 5;   
+            display: none;  
+        }  
+
+        .history-dropdown.show {  
+            display: block;  
+        }  
+
+
+        /* Garis antara input dan daftar history */  
+        .separator-line {  
+            height: 1px;  
+            background-color: rgba(255, 255, 255, 0.3);  
+            margin: 0 20px;  
+            margin-bottom: 10px;  
+        }  
+          
+        /* Styling Item Riwayat */  
+        .history-item {  
+            display: flex;  
+            align-items: center;  
+            padding: 5px 20px;   
+            color: #FFFFFF;  
+            font-size: 1em;  
+            cursor: pointer;  
+            text-decoration: none;  
+        }  
+
+        .history-item:hover {  
+            background-color: rgba(255, 255, 255, 0.1);   
+        }  
+          
+        /* Gambar Ikon histort */  
+        .history-item img {  
+            width: 15px;  
+            height: 15px;  
+            margin-right: 15px;  
+        }  
+          
+        .history-text {  
+            flex-grow: 1;  
+            font-weight: 500;   
+        }  
+          
+
+      
+        /*LIHAT LEBIH BANYAK REKOMENDASI TOKOH (Horizontal Scroll)*/  
+        .rekomendasi-section {   
+            padding: 20px 0;   
+            margin-top: 50px;   
+        }  
+        .rekomendasi-section h2 {  
+            margin-bottom: 2px;  
+            color: black;  
+            position: relative;  
+            left: 28px;  
+        }  
+          
+        .cards-container {  
+            display: flex;         
+            overflow-x: scroll;  
+            overflow-y: hidden; 
+            padding-bottom: 20px;   
+            flex-wrap: nowrap;     
+            scroll-behavior: smooth;  
+            background-color: #724636;  
+            padding-left: 25px;  
+            padding-top: 25px;   
+        }  
+
+        .cards-container::-webkit-scrollbar {  
+            display: none;   
+        }  
+        .card {  
+            flex: 0 0 250px; /* Lebar kartu tetap untuk scroll horizontal */  
+            margin-right: 20px;   
+            padding: 15px;  
+            background-color: #4a2c18;  
+            border-radius: 15px;  
+            text-align: center;  
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);  
+            transition: transform 0.2s;   
+        }  
+          
+        .card:hover {  
+            transform: translateY(-5px);  
+        }  
+
+        .card img {  
+            width: 100%;  
+            height: 345px;   
+            object-fit: cover;  
+            border-radius: 10px;  
+        }  
+
+        .card h3 {  
+            font-size: 1.1em;  
+            margin: 10px 0 5px;  
+            color: #f0f0f0;  
+            position: relative;   
+            top: -5px;  
+        }  
+
+        .card button {  
+            display: flex;   
+            align-items: center;   
+            justify-content: center;   
+            padding: 10px 20px;  
+            background-color: #f7f7f7;   
+            color: black;  
+            border: none;  
+            border-radius: 20px;  
+            cursor: pointer;  
+            margin-top: 10px;  
+            width: 100%;  
+            font-weight: bold;  
+            transition: background-color 0.2s, transform 0.2s;  
+             
+        }  
+          
+        .card button:hover {  
+            background-color: #e0e0e0;  
+            transform: scale(1.02);  
+        }  
+
+        .card button img {  
+            width: 18px;      
+            height: 18px;     
+            margin-left: 0px; /* Jarak antara teks dan gambar */  
+            object-fit: contain;  
+          
+        }  
+
+        .container {  
+          display: flex;  
+          align-items: center;  
+          justify-content: center;  
+          gap: 50px;  
+          background-color: white;  
+          padding: 50px;  
+          border-radius: 20px;  
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);  
+          max-width: 1000px; /* Fix max-width */  
+          margin: 40px auto;  
+        }  
+
+        .images {  
+          display: grid;  
+          grid-template-columns: repeat(2, 1fr);  
+          gap: 20px;  
+        }  
+
+        .images img {  
+          width: 250px;  
+          height: 180px;  
+          object-fit: cover;  
+        }  
+
+
+         /*BAGIAN 2 LIHAT LEBIH BANYAK SEJARAH (Responsive Grid)*/  
+        .sejarah-section {  
+            padding: 20px 0;  
+            margin-top: 40px;  
+        }  
+        .sejarah-section h2 {  
+            padding-left: 28px;  
+            position: relative;   
+            top: 15px;  
+        }  
+
+        .cards-container-responsive {  
+            display: flex;         
+            flex-wrap: wrap;   
+            padding: 20px 50px;   
+            justify-content: flex-start;  
+            gap: 20px;  
+        }  
+
+        /* agar kartu 4 di 1 baris */  
+        .card-responsive {  
+            display: flex;         
+            flex-direction: column;   
+            flex: 0 0 calc(25% - 15px); /* 4 kartu per baris */  
+            padding: 15px;  
+            background-color: #4a2c18;   
+            border-radius: 15px;  
+            text-align: center;  
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);  
+            transition: transform 0.2s;   
+        }  
+
+        /* agar kartu rapi */  
+        .card-spacer {  
+            flex: 0 0 calc(25% - 15px);   
+            visibility: hidden;   
+            height: 0;   
+            padding: 0;  
+            margin: 0;  
+        }  
+
+          
+        .card-responsive img {  
+            width: 100%;  
+            height: 345px;   
+            object-fit: cover;  
+            border-radius: 10px;  
+        }  
+        .card-responsive h3 {  
+            font-size: 1.1em;  
+            margin: 10px 0 5px;  
+            color: #f0f0f0;  
+        }  
+
+        /*bintang*/  
+        .rating-stars {  
+            font-size: 1.5rem; /* Ukuran font disesuaikan untuk bintang Unicode */  
+            color: #fbbf24;   
+            margin-bottom: 0.75rem;  
+            letter-spacing: 2px;  
+            position: relative; /*untuk menggeser bintang */  
+            top: -10px; /*untuk menggeser bintang */  
+          
+        }  
+          
+        /* Bintang yang tidak terisi (Unicode Bintang Kosong) - Tema Gelap */  
+        .rating-stars .unfilled-star {  
+            color: rgba(255, 255, 255, 0.5);   
+        }  
+
+        .card-responsive button {  
+            display: flex;   
+            align-items: center;   
+            justify-content: center;   
+            padding: 10px 20px;  
+            background-color: #f7f7f7;   
+            color: black;  
+            border: none;  
+            border-radius: 20px;  
+            cursor: pointer;  
+            margin-top: 10px;  
+            width: 100%;  
+            font-weight: bold;  
+            position: relative;   
+            top: -10px;  
+        }  
+        .card-responsive button img {  
+            width: 18px;      
+            height: 18px;     
+            margin-left: 0px;   
+            object-fit: contain;  
+        }
+
+        /*FOOTER*/
+        .footer {
+            background-color: #4a2c18;
+            color: #fff;
+            padding: 40px 20px;
+            font-size: 14px;
+        }
+
+        .footer-container {  
+            max-width: 1200px;   
+            margin: 0 auto;   
+            display: grid;  
+            grid-template-columns: 1.2fr 2.5fr 1fr;   
+            gap: 20px;   
+            align-items: flex-start;  
+        }  
+        .footer-kolom {  
+            padding: 0 10px;  
+        }  
+          
+        /* logo info*/  
+        .logo-info {  
+            display: flex;  
+            flex-direction: column;  
+            align-items: flex-start;  
+        }  
+
+        .logo-title {  
+            display: flex;  
+            align-items: center;  
+            margin-bottom: 10px;  
+        }  
+          
+        .logo-title img {  
+            width: 40px;   
+            height: 40px;  
+            margin-right: 8px;  
+               
+        }  
+
+        .logo-title h3 {  
+            color: white;  
+            margin: 0;  
+            font-size: 18px;  
+        }  
+
+        .logo-info p {  
+            margin: 0 0 15px 0;  
+            line-height: 1.5;  
+        }  
+
+        .sosial-media-wrapper {  
+            margin-top: 10px;  
+        }  
+          
+        .sosial-media {  
+            display: flex;  
+            margin-bottom: 5px;  
+        }  
+          
+        .sosial-media a {  
+            color: #fff;   
+            font-size: 24px;  
+            margin-right: 15px;  
+            text-decoration: none;  
+        }  
+          
+        .sosial-media-wrapper span {  
+            font-size: 14px;  
+            color: inherit;  
+        }  
+          
+        /* menu tentang kita*/  
+          
+        .middle-section {  
+            display: flex;  
+            flex-direction: column;  
+        }  
+          
+        /*Beranda, Artikel*/  
+        .navigasi-horizontal {  
+            display: flex;  
+            justify-content: space-between;   
+            margin-bottom: 30px;   
+            flex-wrap: wrap;  
+            color: white;  
+        }  
+          
+        .navigasi-horizontal a {  
+            color: inherit;  
+            text-decoration: none;  
+            font-weight: bold;  
+            font-size: 16px;  
+            padding-right: 20px;   
+        }  
+          
+        /* Judul Tentang Kita" */  
+        .middle-section h4 {  
+            color: white;  
+            margin-top: 0;  
+            margin-bottom: 10px;  
+            font-weight: bold;  
+            font-size: 16px;  
+        }  
+          
+        /*kolom*/  
+        .kontak .item-kontak {  
+            margin-bottom: 15px;  
+        }  
+          
+        .kontak .item-kontak p {  
+            margin: 2px 0;  
+        }  
+          
+        .kontak .item-kontak p:first-child {  
+            font-weight: bold;  
+            margin-bottom: 2px;  
+            color: white;  
+            display: flex;  
+            align-items: center;  
+        }  
+          
+        /*Ikon Telepon & Email */  
+        .kontak .item-kontak i {  
+            margin-right: 8px;  
+            font-size: 18px;  
+            color: #fff;  
+        }  
+
+        /* --- MEDIA QUERIES UNTUK RESPONSIVITAS --- */  
+
+        /* Navbar & Hamburger */  
+        @media (max-width: 1024px) {  
+            nav, .desktop-user-icon { /* Sembunyikan navigasi desktop dan ikon user */  
+                display: none;   
+            }  
+
+            .hamburger-menu {  
+                display: block; /* Tampilkan ikon hamburger */  
+            }  
+        }  
+          
+        /* Section Sejarah (Tablet) */  
+        @media (max-width: 1024px) {  
+          .cards-container-responsive {  
+            padding: 20px 30px;   
+          }  
+          .sejarah-section h2 {  
+            padding-left: 30px;   
+          }  
+          .card-responsive, .card-spacer {  
+            /* Tablet: 2 kartu per baris */  
+            flex: 0 0 calc(50% - 10px);  
+          }  
+        }  
+          
+        /* Section Why Choose Us (Mengapa Memilih Kami) */  
+        @media (max-width: 900px) {  
+            .container {  
+                flex-direction: column; /* Tumpuk blok gambar dan blok teks */  
+                gap: 30px;  
+                padding: 30px 20px;  
+            }  
+            .images {  
+                grid-template-columns: repeat(2, 1fr);  
+                gap: 15px;  
+                width: 100%;   
+                margin: 0 auto;   
+            }  
+            .images img {  
+                width: 100%;  
+                height: auto;  
+                min-height: 120px;  
+                max-height: 150px;  
+                object-fit: cover;  
+            }  
+        }  
+
+
+        /* Mobile (Header, Search, Cards, Footer) */  
+        @media (max-width: 600px) {  
+            /* Header/Navbar */
+            header {  
+                height: 50px;  
+                padding: 0 15px;  
+            }  
+            .logo-text-img {
+                 height: 55px; /* Sesuaikan ukuran logo teks di mobile */
+            }
+            .search-box {  
+                max-width: 90%;  
+            }  
+            .history-dropdown {
+                max-width: 90%;
+            }
+
+            /* Card Section (Sejarah) */
+            .cards-container-responsive {  
+                padding: 20px;   
+            }  
+            .sejarah-section h2, .rekomendasi-section h2 {  
+                padding-left: 20px;  
+                left: 0; /* Atur ulang posisi H2 */
+            }  
+            .card-responsive, .card-spacer {  
+                /* Mobile: 1 kartu per baris */  
+                flex: 0 0 100%;  
+            }  
+
+            /* Footer */
+            .footer-container {  
+                grid-template-columns: 1fr;   
+                gap: 30px;  
+            }  
+            .navigasi-horizontal {  
+                flex-direction: column;  
+                margin-bottom: 15px;  
+            }  
+            .navigasi-horizontal a {  
+                margin-bottom: 10px;  
+                padding-right: 0;  
+            }  
+        }  
+
+        a{  
+            text-decoration: none;  
+        }  
+
+    </style>
+
+</head>  
+<body>
+    <header>
+        <div class="logo">
+            <img src="logobenar.png"
+            alt="logo PJBL" class="logo-img">
+            <img src="sejput.png"
+            alt="namaweb text" class="logo-text-img">
+        </div>
+        <!-- Hamburger Menu (Mobile) -->  
+        <button class="hamburger-menu" id="hamburger-btn">  
+            <i class="fas fa-bars"></i>  
+        </button>  
+
+        <!-- Navigasi Desktop -->  
+        <nav class="desktop-nav">  
+            <ul>  
+                <li><a href="landingpagepilihanfix.html">Beranda</a></li>  
+                <li class="dropdown">  
+                    <a href="#" onclick="toggleDropdown(event)">Artikel ▾</a>  
+                    <div class="dropdown-menu" id="dropdown-menu">  
+                        <div class="dropdown-inner">  
+                            <a href="daftarsearchSejarah.html">Sejarah</a></div>  
+                            <div class="dropdown-separator"></div>  
+                            <div class="dropdown-inner">  
+                            <a href="daftarsearchBiografi.html">Biografi Tokoh</a>  
+                        </div>  
+                    </div>  
+                </li>   
+                <li><a href="favorit.html">Favorit</a></li>  
+                <li><a href="rating.html">Ulasan</a></li>  
+            </ul>  
+        </nav>  
+        
+        <!-- User Icon Desktop -->  
+        <div class="user-icon desktop-user-icon">  
+            <a href="history.html">  
+                <i class="fas fa-user-circle"></i>  
+            </a>  
+        </div>  
+    </header>  
+
+    <!-- Sidebar (Mobile) -->  
+    <div class="sidebar" id="sidebar">  
+        <button class="close-btn" id="close-sidebar-btn">&times;</button>  
+        <div class="sidebar-content">  
+            <!-- Icon Profile di dalam Sidebar -->  
+            <div class="sidebar-user-icon">  
+                <a href="loginpage.html" onclick="closeSidebar()">  
+                    <i class="fas fa-user-circle"></i> Profil Pengguna  
+                </a>  
+            </div>  
+              
+            <a href="landingpagepilihanfix.html" onclick="closeSidebar()">Beranda</a>  
+              
+            <div class="dropdown-sidebar">  
+                <a href="#" onclick="toggleDropdownSidebar(event)">Artikel ▾</a>  
+                <div class="dropdown-menu-sidebar" id="dropdown-menu-sidebar">  
+                    <div class="dropdown-inner"><a href="daftarsearchSejarah.html" onclick="closeSidebar()">Sejarah</a></div>  
+                    <div class="dropdown-separator"></div>  
+                    <div class="dropdown-inner"><a href="daftarsearchBiografi.html" onclick="closeSidebar()">Biografi Tokoh</a></div>  
+                </div>  
+            </div>  
+
+            <a href="favorit.html" onclick="closeSidebar()">Favorit</a>  
+            <a href="rating.html" onclick="closeSidebar()">Ulasan</a>  
+        </div>  
+    </div>  
+
+
+    <div class="search-container">  
+        <form action="#" method="get" class="search-box">  
+             <img src="Vector (3).png" alt="ikon pencarian">  
+            <input type="text" placeholder="Pencarian..." name="q" class="search-input">  
+        </form>  
+          
+        <!-- riwayat-->  
+        <div class="history-dropdown">  
+            <!-- Garis pemisah -->  
+            <div class="separator-line"></div>  
+            <a href="#" class="history-item">  
+                <img src="Vector (8).png" alt="Ikon Riwayat">  
+                <span class="history-text">Sumpah Pemuda</span>  
+            </a>  
+
+            <a href="#" class="history-item">  
+                <img src="Vector (8).png" alt="Ikon Riwayat">  
+                <span class="history-text">Proklamasi Kemerdekaan</span>  
+            </a>  
+
+            <a href="#" class="history-item">  
+                <img src="Vector (8).png" alt="Ikon Riwayat">  
+                <span class="history-text">Bandung Lautan Api</span>  
+            </a>  
+
+            <a href="#" class="history-item">  
+                <img src="Vector (8).png" alt="Ikon Riwayat">  
+                <span class="history-text">pertempuran surabaya</span>  
+            </a>  
+              
+            <a href="#" class="history-item">  
+                <img src="Vector (8).png" alt="Ikon Riwayat">  
+                <span class="history-text">Indonesia Dikuasai Jepang</span>  
+            </a>  
+        </div>  
+    </div>  
+
+
+      <section class="rekomendasi-section">
+        <h2>Biografi Tokoh</h2>
+        
+        <div class="cards-container">
+            
+            <div class="card">
+                <img src="ay.jpg" alt="Proklamasi Kemerdekaan">
+                <h3>Ahmad Yani</h3>
+                <a href="sampulAhmadYani.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                </a>
+            </div>
+            
+            <div class="card">
+                <img src="kr.jpg" alt="Bandung Lautan Api">
+                <h3>R.A Kartini</h3>
+                <a href="sampulKartini.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                </a>
+            </div>
+            
+            <div class="card">
+                <img src="Soetomo.png" alt="G30S/PKI">
+                <h3>Dr Soetomo</h3>
+                <a href="sampulSoetomo.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                </a>
+            </div>
+            
+            <div class="card">
+                <img src="ir.jpg" alt="Sumpah Pemuda">
+                <h3>Ir. Sukarno</h3>
+                <a href="sampulSoekarno.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                </a>
+            </div>
+
+            <div class="card">
+                <img src="ki.jpg" alt="Artikel Tambahan 5">
+                <h3>Ki Hajar Dewantara</h3>
+                <a href="sampuldewantara.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                </a>
+            </div>
+            
+            <div class="card">
+                <img src="th.jpg" alt="Artikel Tambahan 6">
+                <h3>Mohammad Hatta</h3>
+                <a href="sampulhatta.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                </a>
+            </div>
+            
+        </div>
+    </section>
+
+<section class="rekomendasi-section sejarah-section">
+        <h2>Artikel Sejarah</h2>
+
+        <div class="cards-container-responsive">
+            
+            <div class="card-responsive">
+                <img src="proklamasi.png" alt="Sejarah 1">
+                <h3>Proklamasi Kemerdekaan</h3>
+                <div class="rating-stars">
+                            ★★★★★<span class="unfilled-star"></span>
+                        </div>
+                        <a href="sampulartikelproklamasi.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+            </a>
+            </div>
+            
+            <div class="card-responsive">
+                <img src="bandung.jpg" alt="Sejarah 2">
+                <h3>Bandung Lautan Api</h3>
+                <div class="rating-stars">
+                            ★★★★<span class="unfilled-star">★</span>
+                        </div>
+                        <a href="sampulartikelbandung.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                        </a>
+            </div>
+            
+            <div class="card-responsive">
+                <img src="g30.jpg" alt="Sejarah 3">
+                <h3>Peristiwa G30S/PKI</h3>
+                <div class="rating-stars">
+                            ★★★★★<span class="unfilled-star"></span>
+                        </div>
+                        <a href="sampulartikelG30.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                        </a>
+            </div>
+            
+            <div class="card-responsive">
+                <img src="sumpah.jpg" alt="Sejarah 4">
+                <h3>Sumpah Pemuda</h3>
+                <div class="rating-stars">
+                            ★★★★★<span class="unfilled-star">★</span>
+                        </div><a href="sampulartikelsumpahp.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                </a>
+            </div>
+
+            <div class="card-responsive">
+                <img src="mey.jpg" alt="Sejarah 5">
+                <h3>Kerusuhan Mei</h3>
+                <div class="rating-stars">
+                            ★★★★<span class="unfilled-star">★</span>
+                        </div>
+                        <a href="sampulartikelmei.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                        </a>
+            </div>
+            
+            <div class="card-responsive">
+                <img src="meja.jpg" alt="Sejarah 6">
+                <h3>Konferensi Meja Bundar</h3>
+                <div class="rating-stars">
+                            ★★★★<span class="unfilled-star">★</span>
+                        </div>
+                        <a href="sampulartikelKonversi.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                        </a>
+            </div>
+
+            <div class="card-responsive">
+                <img src="sri.jpg" alt="Sejarah 6">
+                <h3>Kerajaan Sriwijaya</h3>
+                <div class="rating-stars">
+                            ★★★★<span class="unfilled-star">★</span>
+                        </div>
+                        <a href="sampulartikelSriwijaya.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                        </a>
+            </div>
+
+            <div class="card-responsive">
+                <img src="bd.jpg" alt="Sejarah 6">
+                <h3>Candi Borobudur</h3>
+                <div class="rating-stars">
+                            ★★★★<span class="unfilled-star">★</span>
+                        </div>
+                        <a href="sampulartikelCandiB.html">
+                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                        </a>
+            </div>
+
+            
+            
+            <div class="card-spacer"></div>
+            <div class="card-spacer"></div>
+            
+        </div>
+    </section>
+    
+    
+     <div class="footer">  
+        <div class="footer-container">  
+              
+            <div class="footer-kolom logo-info">  
+                <div class="logo-title">  
+                    <img src="logobenar.png" alt="Logo Sejiwa">   
+                    <h3>Sejiwa.id</h3>  
+                </div>  
+                <p>Sejarah Indonesia: Warisan berharga, Sumber Pengetahuan</p>  
+                <div class="sosial-media-wrapper">  
+                    <div class="sosial-media">  
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>  
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>  
+                    </div>  
+                    <span>Ikuti Kami</span>  
+                </div>  
+            </div>  
+              
+            <div class="footer-kolom middle-section">  
+                <div class="navigasi-horizontal">  
+                    <a href="#">Beranda</a>  
+                    <a href="#">Artikel</a>  
+                    <a href="#">Favorit</a>  
+                    <a href="#">Ulasan</a>  
+                </div>  
+
+                <div class="tentang-kita-container">  
+                    <h4>Tentang Kita</h4>  
+                    <p>Sejiwa.id adalah proyek kami untuk mengeksplorasi sejarah Indonesia dan berbagai cerita yang berharga dari masa lalu.</p>  
+                </div>  
+            </div>  
+              
+            <div class="footer-kolom kontak">  
+                <div class="item-kontak">  
+                    <p><i class="fas fa-envelope"></i> Email:</p>   
+                    <p>blaabla@gmail.com</p>  
+                    <p>uwthh@gmail.com</p>  
+                </div>  
+                <div class="item-kontak">  
+                    <p><i class="fas fa-phone"></i> Call:</p>   
+                    <p>(480) 555-0103</p>  
+                    <p>(406) 555-0120</p>  
+                </div>  
+            </div>  
+              
+        </div>  
+    </div>  
+
+
+    <script>  
+        // --- Fungsi Dropdown Desktop (Artikel) ---
+        function toggleDropdown(event) {  
+            event.preventDefault();  
+            const menu = document.getElementById('dropdown-menu');  
+            menu.style.display = (menu.style.display === "flex") ? "none" : "flex";  
+        }  
+
+        document.addEventListener("click", function (e) {  
+            const menu = document.getElementById('dropdown-menu');  
+            const dropdown = document.querySelector(".dropdown");  
+
+            // Tutup dropdown desktop jika klik di luar dan lebar layar > 1024px
+            if (dropdown && !dropdown.contains(e.target) && window.innerWidth > 1024) {  
+                menu.style.display = "none";  
+            }  
+        });
+
+        // --- Fungsi Sidebar Mobile ---  
+        const sidebar = document.getElementById('sidebar');  
+        const hamburgerBtn = document.getElementById('hamburger-btn');  
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');  
+        
+        // Membuka sidebar  
+        function openSidebar() {  
+            const screenWidth = window.innerWidth;  
+            let sidebarWidth = '250px';  
+
+            // Sesuaikan lebar sidebar untuk layar kecil  
+            if (screenWidth < 350) {  
+                sidebarWidth = '90%';  
+            } else if (screenWidth < 450) {  
+                sidebarWidth = '300px';  
+            }  
+              
+            sidebar.style.width = sidebarWidth;  
+            document.body.style.overflow = 'hidden'; // Nonaktifkan scroll body  
+        }  
+
+        if (hamburgerBtn) {  
+            hamburgerBtn.addEventListener('click', openSidebar);  
+        }  
+          
+        // Menutup sidebar  
+        if (closeSidebarBtn) {  
+             closeSidebarBtn.addEventListener('click', closeSidebar);  
+        }  
+
+        function closeSidebar() {  
+            sidebar.style.width = '0';  
+            document.body.style.overflow = ''; // Aktifkan scroll body  
+            // Pastikan dropdown di sidebar tertutup  
+            const activeDropdown = document.querySelector('.dropdown-menu-sidebar[style*="display: block"]');  
+            if(activeDropdown) {  
+                activeDropdown.style.display = 'none';  
+            }  
+        }  
+
+        // Dropdown di dalam Sidebar  
+        function toggleDropdownSidebar(event) {  
+            event.preventDefault();  
+            const dropdown = event.target.nextElementSibling;  
+            if (dropdown.style.display === 'block') {  
+                dropdown.style.display = 'none';  
+            } else {  
+                // Tutup dropdown lain sebelum membuka yang baru  
+                const allDropdowns = document.querySelectorAll('.dropdown-menu-sidebar');  
+                allDropdowns.forEach(d => {  
+                    if (d !== dropdown) {  
+                        d.style.display = 'none';  
+                    }  
+                });  
+                dropdown.style.display = 'block';  
+            }  
+        }  
+
+
+        // --- Fungsi Pencarian (Search History) ---
+        const searchInput = document.querySelector('.search-input');
+        const historyDropdown = document.querySelector('.history-dropdown');
+        if (searchInput && historyDropdown) { // Check if elements exist before adding listeners
+            searchInput.addEventListener('focus', function() {
+                historyDropdown.classList.add('show');
+            });
+            searchInput.addEventListener('blur', function() {
+                setTimeout(() => {
+                    historyDropdown.classList.remove('show');
+                }, 200);
+            });
+        }
+    </script>
+
+</body>  
+</html>

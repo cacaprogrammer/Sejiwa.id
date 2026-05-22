@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Admin</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background-color: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 15px;
+    }
+
+    /* ==================== CONTAINER ==================== */
+    .container {
+      display: flex;
+      width: 1000px;
+      height: 620px;
+      background: #fff;
+      border-radius: 28px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.12);
+    }
+
+    /* ==================== PANEL KIRI ==================== */
+    .left {
+      width: 45%;
+      padding: 28px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .left-box {
+      width: 100%;
+      height: 100%;
+      background-color: #d2b7a3;
+      border-radius: 18px;
+      overflow: hidden;
+    }
+
+    .left-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ==================== PANEL KANAN ==================== */
+    .right {
+      width: 55%;
+      padding: 40px 45px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .logo img {
+      width: 60px;
+    }
+
+    .right h3 {
+      text-align: center;
+      font-size: 22px;
+      margin-bottom: 28px;
+      font-weight: 700;
+      color: #3a2a23;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #3a2a23;
+      display: block;
+    }
+
+    .input-group {
+      background: #DAC6BB;
+      border-radius: 14px;
+      height: 46px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 0 16px;
+      font-size: 14px;
+      color: #3a2a23;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      border-radius: 14px;
+      background: #4A2C18;
+      color: #fff;
+      cursor: pointer;
+      transition: .2s;
+      margin-top: 8px;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+      transform: scale(1.02);
+    }
+
+    /* Garis pembatas "atau" */
+    .divider {
+      margin: 18px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1.5px solid #b4b4b4;
+      margin: 0 10px;
+    }
+
+    .divider span {
+      font-size: 13px;
+      font-weight: 600;
+      color: #3a2a23;
+    }
+
+
+    /* ==================== RESPONSIVE ==================== */
+
+    /* Tablet besar */
+    @media (max-width: 1020px) {
+      .container {
+        width: 92%;
+      }
+    }
+
+    /* Tablet / ukuran sedang */
+    @media (max-width: 850px) {
+      .container {
+        flex-direction: column;
+        height: auto;
+      }
+
+      .left {
+        width: 100%;
+        height: 250px;
+        padding: 18px;
+      }
+
+      .right {
+        width: 100%;
+        padding: 30px 28px;
+      }
+    }
+
+    /* Mobile sedang */
+    @media (max-width: 600px) {
+      .right {
+        padding: 25px 22px;
+      }
+
+      .right h3 {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        height: 42px;
+      }
+
+      .btn {
+        padding: 10px;
+        font-size: 14px;
+      }
+    }
+
+    /* Mobile kecil */
+    @media (max-width: 430px) {
+      .right {
+        padding: 20px 18px;
+      }
+
+      .logo img {
+        width: 48px;
+      }
+
+      .right h3 {
+        font-size: 18px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <!-- Panel Kiri -->
+    <div class="left">
+      <div class="left-box">
+        <img src="Group 283.png" alt="Gambar">
+      </div>
+    </div>
+
+    <!-- Panel Kanan -->
+    <div class="right">
+      <div class="logo">
+        <img src="logobenar.png" alt="Logo">
+      </div>
+
+      <h3>Akses Administrator</h3>
+
+      <form>
+        <label>Admin ID</label>
+        <div class="input-group">
+          <input type="text" placeholder="Masukkan No ID" required>
+        </div>
+
+        <label>Kata Sandi</label>
+        <div class="input-group">
+          <input type="password" placeholder="Masukkan Kata Sandi" required>
+        </div>
+
+       
+  <button class="btn">Masuk</button>
+
+
+
+        <div class="divider"><span>atau</span></div>
+
+        <button type="button" class="btn">Bantuan</button>
+      </form>
+    </div>
+
+  </div>
+
+</body>
+</html>

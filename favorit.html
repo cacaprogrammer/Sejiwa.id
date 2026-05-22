@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Favorit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Reset Default Browser */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box; 
+        }
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f7f7f7; 
+            overflow-x: hidden; 
+        }
+        
+        /* Navbar */
+        header {
+            height: 50px; 
+            background-color: #4a2c18;
+            color: #f7f7f7;
+            padding: 0 15px;
+            display: flex;
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0;
+            left: 0;
+            width: 100%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+            z-index: 1000;
+        }
+        /* Dropdown */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 35px;
+            left: -20px;
+            background: #724636;
+            border : none;
+            width: 150px; 
+            padding: 7px; 
+            display: none;
+            flex-direction: column;
+            border-radius: 8px;
+            gap: 0px;
+        }
+
+        .dropdown-inner {
+            background: #ffffff;
+            border-radius: 8px ;
+            border: 2px solid #724636;
+            padding: 2px 0; 
+            overflow: hidden;
+        }
+
+        .dropdown-inner a {
+            color: #000;
+            padding: 2px 0;
+            font-size: 14px;
+            display: block;
+            text-align: center;
+        }
+
+        .dropdown-separator {
+            height: 8px;
+            background: #724636;
+            margin: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo-img{
+            height:40px;
+            width: auto;
+        }
+        .logo-text-img{
+            height: 70px;
+            width: auto;
+            margin-left: -12px;
+            position: relative;
+            top: -2px;
+        }
+        .logo i {
+            margin-right: 8px;
+            font-size: 1.4em;
+        }
+        nav ul {
+            display: flex; 
+            list-style: none; 
+            padding: 0;
+        }
+        nav ul li {
+            margin-left: 20px; 
+        }
+        nav ul li a {
+            text-decoration: none;
+            color: inherit;
+            font-size: 0.95em; 
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        nav ul li a:hover {
+            color: #6d4c41;
+        }        
+        .artikel-link span {
+             margin: 0 4px;
+        }
+        .user-icon i {
+            font-size: 1.6em;
+            cursor: pointer;
+            margin-right: 15px;
+        }
+        .user-icon a {
+            color: #ffffff;
+        }
+        .user-icon i:hover {
+            color: #6d4c41;
+        } 
+
+        /* Hamburger Menu & Sidebar Styling (Mobile) */
+        .hamburger-menu {
+            display: none;
+            background: none;
+            border: none;
+            color: #f7f7f7;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 5px;
+            margin-right: 10px;
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1001;
+            top: 0;
+            right: 0;
+            background-color: #4a2c18;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+            box-shadow: -5px 0 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .sidebar a {
+            padding: 15px 25px;
+            text-decoration: none;
+            font-size: 18px;
+            color: #f7f7f7;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #6d4c41;
+        }
+        
+        .sidebar .close-btn {
+            position: absolute;
+            top: 0;
+            right: 15px;
+            font-size: 36px;
+            margin-left: 50px;
+            color: #f7f7f7;
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .sidebar-user-icon {
+            padding: 20px 25px;
+            border-bottom: 1px solid #6d4c41;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-user-icon a {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .sidebar-user-icon i {
+            margin-right: 10px;
+        }
+
+         /* Dropdown Sidebar */
+        .dropdown-menu-sidebar {
+            display: none;
+            background-color: #724636;
+            padding: 5px 0;
+        }
+
+        .dropdown-menu-sidebar .dropdown-inner {
+            background: #ffffff;
+            border-radius: 8px;
+            border: 2px solid #724636;
+            padding: 2px 0; 
+            margin: 5px 15px;
+        }
+
+        .dropdown-menu-sidebar .dropdown-inner a {
+            color: #000;
+            padding: 5px 10px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .dropdown-menu-sidebar .dropdown-separator {
+            height: 5px;
+            background: #724636;
+            margin: 0 15px;
+        }
+
+        /*pencarian*/
+        .search-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px 0; 
+            margin-bottom: 20px; 
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: #4A2C18; 
+            border-radius: 50px; 
+            padding: 10px 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-icon {
+            font-size: 1.1em;
+            color: #f7f7f7; 
+            margin-right: 10px;
+        }
+
+        .search-input {
+            flex-grow: 1;
+            border: none;
+            background: #4A2C18;
+            color: #f7f7f7;
+            font-size: 1em;
+            outline: none;
+            margin-left: 6px;
+        }
+
+        .search-input::placeholder {
+            color: #d7ccc8;
+        }
+
+        /* wadah utama */
+        .main-wrapper {
+            background-color: #4A2C18;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 20px; 
+            max-width: 1200px; 
+            width: calc(100% - 30px); 
+        }
+        
+        /* latar card bawah (putih) */
+        .main-wrapper.light-theme {
+            background-color: #ffffff;
+            padding: 1rem; 
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); 
+        }
+
+        /* Responsif untuk Layar Sedang */
+        @media (min-width: 768px) {
+            .main-wrapper {
+                 padding: 2rem;
+                 width: calc(100% - 60px); 
+            }
+            .main-wrapper.light-theme {
+                 padding: 1rem;
+            }
+        }
+        
+        /* Gaya Header (lanjutkan membaca) */
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+        
+        /* Gaya Header untuk putih */
+        .main-wrapper.light-theme .header-title {
+            font-size: 1.25rem; 
+            font-weight: 700; 
+            color: #000;
+            margin-bottom: 0.75rem; 
+        }
+
+        /* Wadah Gulir Horizontal */
+        .scroll-container {
+            display: flex;
+            overflow-x: scroll;
+            padding-bottom: 0.5rem;
+            gap: 1rem; 
+        }
+
+        /* Menyembunyikan scrollbar bawaan */
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+        .scroll-container {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Gaya Kartu (atas) */
+        .article-card {
+            flex-shrink: 0;
+            width: 320px;
+            background-color: #4A2C18; 
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(68, 64, 60, 0.5);
+            display: flex;
+            position: relative;
+        }
+        
+        /* gaya kartu untuk bawah */
+        .main-wrapper.light-theme .article-card {
+            background-color: #ffffff;
+            border: 1px solid #f3f4f6; 
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Area Gambar dalam Kartu */
+        .card-image-area {
+            width: 40%;
+            aspect-ratio: 1 / 1;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* Area Konten dalam Kartu */
+        .card-content-area {
+            width: 60%;
+            padding: 0.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: #f9fafb; 
+        }
+        /* Konten untuk tema terang */
+        .main-wrapper.light-theme .card-content-area {
+            color: initial;
+        }
+
+        /* Gaya Teks dan Rating */
+        .content-title {
+            font-weight: 600;
+            font-size: 1.125rem; 
+            line-height: 1.25;
+            margin-bottom: 0.25rem;
+            color: #f9fafb; 
+        }
+        /* Judul untuk tema terang */
+        .main-wrapper.light-theme .content-title {
+            font-size: 1rem; 
+            color: #333333;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-stars {
+            font-size: 1rem;
+            color: #fbbf24; 
+            margin-bottom: 0.75rem;
+            letter-spacing: 2px; 
+        }
+        
+        /* Bintang yang tidak terisi Tema Gelap */
+        .rating-stars .unfilled-star {
+            color: rgba(255, 255, 255, 0.5); 
+        }
+
+        /* Bintang yang tidak terisi Tema Terang */
+        .rating-stars .empty-star {
+            color: #d1d5db; 
+        }
+
+        /* Tombol dan Progres */
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .action-area a {
+            color: #000;
+        }
+
+        .action-button {
+            width: 100%;
+            font-size: 0.75rem;
+            font-weight: bold;
+            background-color: #ffffff;
+            color: #000;
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: background-color 150ms ease-in-out;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .action-button:hover {
+            background-color: #f3f4f6;
+        }
+
+        .arrow-icon {
+            width: 1.2rem;
+            height: 1.2rem;
+            margin-left: 0rem;
+            vertical-align: middle;
+        }
+
+        /* Tombol bawah */
+        .main-wrapper.light-theme .action-button {
+            font-size: 0.875rem; 
+            background-color: #DAC6BB; 
+            color: #000; 
+            padding: 0.35rem 0; 
+            border-radius: 1rem;
+        }
+        .main-wrapper.light-theme .action-button:hover {
+             background-color: #e5e7eb;
+        }
+
+        /* garis progres */
+        .progress-bar-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .progress-label-container {
+            display: flex;
+            justify-content: flex-start;
+        }
+
+        .progress-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8); 
+        }
+
+        .progress-track {
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3); 
+            border-radius: 9999px;
+        }
+
+        .progress-fill {
+            height: 4px;
+            background-color: #fbbf24; 
+            border-radius: 9999px;
+            transition: width 0.4s ease;
+        }
+
+        /* Progress Bar untuk tema terang */
+        .main-wrapper.light-theme .progress-label {
+             color: #000; 
+        }
+        .main-wrapper.light-theme .progress-track {
+            background-color: #e5e7eb; 
+        }
+        .main-wrapper.light-theme .progress-fill {
+            background-color: #fbbf24; 
+        }
+
+        /* tombol tab */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.25rem 0.75rem; 
+            border-radius: 9999px; 
+            font-size: 0.875rem; 
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            transition: all 0.15s ease-in-out;
+        }
+
+        .tab:not(.active) {
+            background-color: #ffffff;
+            color: #000;
+            border-color: #6b7280; 
+        }
+
+        .tab.active {
+            background-color: #DAC6BB;
+            color: #000;
+            border-color: #DAC6BB;
+        }
+
+        /* Tombol hapus dari favorit */
+        .btn-hapus-favorit {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0,0,0,0.4);
+            border: none;
+            color: #fff;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 0.7em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            z-index: 10;
+        }
+        .btn-hapus-favorit:hover {
+            background: rgba(200,0,0,0.7);
+        }
+
+        /* Pesan kosong favorit */
+        .favorit-kosong {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.95em;
+            padding: 10px 0;
+            text-align: center;
+            width: 100%;
+        }
+        .main-wrapper.light-theme .favorit-kosong {
+            color: #888;
+        }
+
+        /* Hamburger button */
+        .hamburger {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Navigasi default untuk desktop */
+        .nav-links {
+            display: flex;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Responsive: sembunyikan menu dan tampilkan hamburger */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 50px;
+                left: 0;
+                width: 100%;
+                background-color: #4A2C18;
+                padding: 10px 0;
+                z-index: 999;
+            }
+
+            .nav-links li {
+                margin: 10px 0;
+                text-align: center;
+            }
+
+            .hamburger {
+                display: block;
+            }
+        }
+
+        /*footer*/
+        .footer {
+            background-color: #4a2c18; 
+            color: #fff; 
+            padding: 40px 20px; 
+            font-size: 14px;
+        }
+
+        .footer-container {
+            max-width: 1200px; 
+            margin: 0 auto; 
+            display: grid;
+            grid-template-columns: 1.2fr 2.5fr 1fr; 
+            gap: 20px; 
+            align-items: flex-start;
+        }
+        .footer-kolom {
+            padding: 0 10px;
+        }
+        
+        .logo-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .logo-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo-title img {
+            width: 40px; 
+            height: 40px;
+            margin-right: 8px;
+        }
+
+        .logo-title h3 {
+            color: white;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .logo-info p {
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+
+        .sosial-media-wrapper {
+            margin-top: 10px;
+        }
+        
+        .sosial-media {
+            display: flex;
+            margin-bottom: 5px;
+        }
+        
+        .sosial-media a {
+            color: #fff; 
+            font-size: 24px;
+            margin-right: 15px;
+            text-decoration: none;
+        }
+        
+        .sosial-media-wrapper span {
+            font-size: 14px;
+            color: inherit;
+        }
+        
+        .middle-section {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .navigasi-horizontal {
+            display: flex;
+            justify-content: space-between; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap;
+            color: white;
+        }
+        
+        .navigasi-horizontal a {
+            color: inherit;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 16px;
+            padding-right: 20px; 
+        }
+        
+        .middle-section h4 {
+            color: white;
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .kontak .item-kontak {
+            margin-bottom: 15px;
+        }
+        
+        .kontak .item-kontak p {
+            margin: 2px 0;
+        }
+        
+        .kontak .item-kontak p:first-child {
+            font-weight: bold;
+            margin-bottom: 2px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+        
+        .kontak .item-kontak i {
+            margin-right: 8px;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                grid-template-columns: 1fr; 
+                gap: 30px;
+            }
+            .navigasi-horizontal {
+                flex-direction: column;
+                margin-bottom: 15px;
+            }
+            .navigasi-horizontal a {
+                margin-bottom: 10px;
+                padding-right: 0;
+            }
+        }
+
+        @media (max-width: 1000px) {
+            .article-grid {
+                grid-template-columns: repeat(2, 1fr); 
+            }
+        }
+        @media (max-width: 500px) {
+            .article-grid {
+                grid-template-columns: 1fr; 
+            }
+            .search-box {
+                max-width: 90%;
+            }
+        }
+
+        /* RESPONSIVE NAVBAR */
+        @media (max-width: 1024px) {
+            nav, .user-icon {
+                display: none;
+            }
+
+            .hamburger-menu {
+                display: block;
+            }
+
+            .sidebar {
+                width: 0;
+            }
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff;
+        }
+        .action-area a {
+            text-decoration: none;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logobenar.png" alt="logo PJBL" class="logo-img">
+            <img src="sejput.png" alt="namaweb text" class="logo-text-img">
+        </div>
+        <!-- Hamburger Menu (Mobile) -->
+        <button class="hamburger-menu" id="hamburger-btn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <nav class="desktop-nav">
+            <ul>
+                <li><a href="landingpagepilihanfix.html">Beranda</a></li>
+                <li class="dropdown">
+                    <a href="#" onclick="toggleDropdown(event)">Artikel ▾</a>
+
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <div class="dropdown-inner">
+                            <a href="daftarsearchSejarah.html">Sejarah</a></div>
+                            <div class="dropdown-separator"></div>
+                            <div class="dropdown-inner">
+                            <a href="daftarsearchBiografi.html">Biografi Tokoh</a>
+                        </div>
+                    </div>
+
+                </li>
+                <li><a href="favorit.html">Favorit</a></li>
+                <li><a href="rating.html">Ulasan</a></li>
+            </ul>
+        </nav>
+
+        <div class="user-icon">
+            <a href="history.html">
+                <i class="fas fa-user-circle"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- Sidebar (Mobile) -->
+    <div class="sidebar" id="sidebar">
+        <button class="close-btn" id="close-sidebar-btn">&times;</button>
+        <div class="sidebar-content">
+            <div class="sidebar-user-icon">
+                <a href="loginpage.html" onclick="closeSidebar()">
+                    <i class="fas fa-user-circle"></i> Profil Pengguna
+                </a>
+            </div>
+            
+            <a href="landingpagepilihanfix.html" onclick="closeSidebar()">Beranda</a>
+            
+            <div class="dropdown-sidebar">
+                <a href="#" onclick="toggleDropdownSidebar(event)">Artikel ▾</a>
+                <div class="dropdown-menu-sidebar" id="dropdown-menu-sidebar">
+                    <div class="dropdown-inner"><a href="daftarsearchSejarah.html" onclick="closeSidebar()">Sejarah</a></div>
+                    <div class="dropdown-separator"></div>
+                    <div class="dropdown-inner"><a href="daftarsearchBiografi.html" onclick="closeSidebar()">Biografi Tokoh</a></div>
+                </div>
+            </div>
+
+            <a href="favorit.html" onclick="closeSidebar()">Favorit</a>
+            <a href="rating.html" onclick="closeSidebar()">Ulasan</a>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" placeholder="Pencarian..." class="search-input">
+        </div>
+    </div>
+
+    <!-- ===== LANJUTKAN MEMBACA — diisi dinamis dari localStorage ===== -->
+    <div class="main-wrapper">
+        <h2 class="header-title">Lanjutkan Membaca</h2>
+        <div class="scroll-container" id="scroll-favorit">
+            <!-- Kartu favorit dirender oleh JavaScript di bawah -->
+        </div>
+    </div>
+
+    <!-- ===== LAINNYA — konten statis seperti aslinya ===== -->
+    <div class="main-wrapper light-theme">
+        <h2 class="header-title">Lainnya</h2>
+
+        <!-- Navigasi Tabs -->
+        <div class="nav-tabs">
+            <button class="tab active" onclick="gantiTab(this, 'sejarah')">Sejarah</button>
+            <button class="tab" onclick="gantiTab(this, 'biografi')">Biografi Tokoh</button>
+        </div>
+
+        <!-- scroll -->
+        <div class="scroll-container" id="scroll-lainnya">
+
+            <!-- Sejarah -->
+            <div class="article-card" data-kategori="sejarah">
+                <div class="card-image-area">
+                    <img src="bandung.jpg" alt="Peristiwa Bandung Lautan Api" class="card-image">
+                </div>
+                <div class="card-content-area">
+                    <div>
+                        <h3 class="content-title">Peristiwa Bandung Lautan Api</h3>
+                        <div class="rating-stars">
+                            ★★★★<span class="empty-star">★</span>
+                        </div>
+                    </div>
+                    <div class="action-area">
+                        <div class="action-area">
+                            <a href="sampulartikelbandung.html"><button class="action-button">Baca Sekarang</button></a>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-label-container">
+                                <p class="progress-label">0%</p>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article-card" data-kategori="sejarah">
+                <div class="card-image-area">
+                    <img src="malari.jpg" alt="Peristiwa Malari 1974" class="card-image">
+                </div>
+                <div class="card-content-area">
+                    <div>
+                        <h3 class="content-title">Peristiwa Malari 1974</h3>
+                        <div class="rating-stars">
+                            ★★★★<span class="empty-star">★</span>
+                        </div>
+                    </div>
+                    <div class="action-area">
+                        <div class="action-area">
+                            <a href="sampulartikelmalari.html"><button class="action-button">Baca Sekarang</button></a>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-label-container">
+                                <p class="progress-label">0%</p>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article-card" data-kategori="sejarah">
+                <div class="card-image-area">
+                    <img src="mei.jpg" alt="Kerusuhan Mei 1998" class="card-image">
+                </div>
+                <div class="card-content-area">
+                    <div>
+                        <h3 class="content-title">Kerusuhan Mei 1998</h3>
+                        <div class="rating-stars">
+                            ★★★<span class="empty-star">★★</span>
+                        </div>
+                    </div>
+                    <div class="action-area">
+                        <div class="action-area">
+                            <a href="sampulartikelmei.html"><button class="action-button">Baca Sekarang</button></a>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-label-container">
+                                <p class="progress-label">0%</p>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Biografi — tersembunyi default -->
+            <div class="article-card" data-kategori="biografi" style="display:none;">
+                <div class="card-image-area">
+                    <img src="sd.jpg" alt="Jendral Soedirman" class="card-image">
+                </div>
+                <div class="card-content-area">
+                    <div>
+                        <h3 class="content-title">Jendral Soedirman</h3>
+                        <div class="rating-stars">
+                            ★★★★★
+                        </div>
+                    </div>
+                    <div class="action-area">
+                        <div class="action-area">
+                            <a href="sampulSoedirman.html"><button class="action-button">Baca Sekarang</button></a>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-label-container">
+                                <p class="progress-label">0%</p>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article-card" data-kategori="biografi" style="display:none;">
+                <div class="card-image-area">
+                    <img src="kr.jpg" alt="R.A Kartini" class="card-image">
+                </div>
+                <div class="card-content-area">
+                    <div>
+                        <h3 class="content-title">R.A Kartini</h3>
+                        <div class="rating-stars">
+                            ★★★★<span class="empty-star">★</span>
+                        </div>
+                    </div>
+                    <div class="action-area">
+                        <div class="action-area">
+                            <a href="sampulKartini.html"><button class="action-button">Baca Sekarang</button></a>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-label-container">
+                                <p class="progress-label">0%</p>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article-card" data-kategori="biografi" style="display:none;">
+                <div class="card-image-area">
+                    <img src="btt.jpg" alt="Bung Tomo" class="card-image">
+                </div>
+                <div class="card-content-area">
+                    <div>
+                        <h3 class="content-title">Bung Tomo</h3>
+                        <div class="rating-stars">
+                            ★★★★<span class="empty-star">★</span>
+                        </div>
+                    </div>
+                    <div class="action-area">
+                        <div class="action-area">
+                            <a href="sampulBungtomo.html"><button class="action-button">Baca Sekarang</button></a>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-label-container">
+                                <p class="progress-label">0%</p>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: 0%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="footer-container">
+            
+            <div class="footer-kolom logo-info">
+                <div class="logo-title">
+                    <img src="logobenar.png" alt="Logo Sejiwa"> 
+                    <h3>Sejiwa.id</h3>
+                </div>
+                <p>Sejarah Indonesia: Warisan berharga, Sumber Pengetahuan</p>
+                <div class="sosial-media-wrapper">
+                    <div class="sosial-media">
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    </div>
+                    <span>Ikuti Kami</span>
+                </div>
+            </div>
+            
+            <div class="footer-kolom middle-section">
+                <div class="navigasi-horizontal">
+                    <a href="#">Beranda</a>
+                    <a href="#">Artikel</a>
+                    <a href="#">Favorit</a>
+                    <a href="#">Ulasan</a>
+                </div>
+
+                <div class="tentang-kita-container">
+                    <h4>Tentang Kita</h4>
+                    <p>Sejiwa.id adalah proyek kami untuk mengeksplorasi sejarah Indonesia dan berbagai cerita yang berharga dari masa lalu.</p>
+                </div>
+            </div>
+            
+            <div class="footer-kolom kontak">
+                <div class="item-kontak">
+                    <p><i class="fas fa-envelope"></i> Email:</p> 
+                    <p>blaabla@gmail.com</p>
+                    <p>uwthh@gmail.com</p>
+                </div>
+                <div class="item-kontak">
+                    <p><i class="fas fa-phone"></i> Call:</p> 
+                    <p>(480) 555-0103</p>
+                    <p>(406) 555-0120</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- FUNGSI NAVBAR DESKTOP ---
+        function toggleDropdown(event) {
+            event.stopPropagation();
+            const menu = document.getElementById('dropdown-menu');
+            menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
+        }
+
+        document.addEventListener("click", function(e) {
+            const menu = document.getElementById('dropdown-menu');
+            const dropdown = document.querySelector(".dropdown");
+            if (dropdown && !dropdown.contains(e.target)) {
+                menu.style.display = "none";
+            }
+        });
+
+        // --- FUNGSI SIDEBAR MOBILE ---
+        const sidebar = document.getElementById('sidebar');
+        const hamburgerBtn = document.getElementById('hamburger-btn');
+        const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+
+        function openSidebar() {
+            const screenWidth = window.innerWidth;
+            let sidebarWidth = '250px';
+
+            if (screenWidth < 350) {
+                sidebarWidth = '90%';
+            } else if (screenWidth < 450) {
+                sidebarWidth = '300px';
+            }
+            
+            sidebar.style.width = sidebarWidth;
+            document.body.style.overflow = 'hidden';
+        }
+
+        hamburgerBtn.addEventListener('click', openSidebar);
+        closeSidebarBtn.addEventListener('click', closeSidebar);
+
+        function closeSidebar() {
+            sidebar.style.width = '0';
+            document.body.style.overflow = '';
+            const activeDropdown = document.querySelector('.dropdown-menu-sidebar[style*="display: block"]');
+            if(activeDropdown) {
+                activeDropdown.style.display = 'none';
+            }
+        }
+
+        function toggleDropdownSidebar(event) {
+            event.preventDefault();
+            const dropdown = event.target.nextElementSibling;
+            if (dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            } else {
+                const allDropdowns = document.querySelectorAll('.dropdown-menu-sidebar');
+                allDropdowns.forEach(d => {
+                    if (d !== dropdown) {
+                        d.style.display = 'none';
+                    }
+                });
+                dropdown.style.display = 'block';
+            }
+        }
+
+        // --- FUNGSI TAB LAINNYA ---
+        function gantiTab(tabEl, kategori) {
+            // Update style tombol tab
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tabEl.classList.add('active');
+
+            // Tampilkan/sembunyikan kartu sesuai kategori
+            document.querySelectorAll('#scroll-lainnya .article-card').forEach(card => {
+                card.style.display = card.getAttribute('data-kategori') === kategori ? 'flex' : 'none';
+            });
+        }
+
+        // --- FUNGSI FAVORIT DINAMIS ---
+        const FAVORIT_KEY = 'sejiwa_favorit';
+
+        // Ambil data favorit dari localStorage
+        function getFavorit() {
+            try { return JSON.parse(localStorage.getItem(FAVORIT_KEY)) || []; }
+            catch { return []; }
+        }
+
+        // Hapus satu artikel dari favorit
+        function hapusDariFavorit(id) {
+            let favorit = getFavorit().filter(f => f.id !== id);
+            localStorage.setItem(FAVORIT_KEY, JSON.stringify(favorit));
+            renderFavorit(); // render ulang
+        }
+
+        // Buat HTML satu kartu favorit
+        function buatKartuFavorit(artikel) {
+            const progress = artikel.progress || 0;
+
+            const kartu = document.createElement('div');
+            kartu.className = 'article-card';
+            kartu.innerHTML = `
+                <!-- Tombol X hapus dari favorit -->
+                <button class="btn-hapus-favorit" title="Hapus dari Favorit" onclick="hapusDariFavorit('${artikel.id}')">
+                    <i class="fas fa-times"></i>
+                </button>
+
+                <div class="card-image-area">
+                    <img src="${artikel.gambar}" alt="${artikel.judul}" class="card-image">
+                </div>
+
+                <div class="card-content-area">
+                    <div>
+                        <h3 class="content-title">${artikel.judul}</h3>
+                        <div class="rating-stars">
+                            ★★★★<span class="unfilled-star">★</span>
+                        </div>
+                    </div>
+
+                    <div class="action-area">
+                        <div class="action-area">
+                            <a href="${artikel.link}">
+                                <button class="action-button">
+                                    Baca Sekarang
+                                    <img src="majesticons_arrow-right.png" alt="panah" class="arrow-icon">
+                                </button>
+                            </a>
+                        </div>
+
+                        <!-- Progress bar sesuai % baca tersimpan -->
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-label-container">
+                                <p class="progress-label">${progress}%</p>
+                            </div>
+                            <div class="progress-track">
+                                <div class="progress-fill" style="width: ${progress}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            return kartu;
+        }
+
+        // Render semua kartu favorit ke dalam scroll container
+        function renderFavorit() {
+            const container = document.getElementById('scroll-favorit');
+            container.innerHTML = '';
+
+            const favorit = getFavorit();
+
+            if (favorit.length === 0) {
+                container.innerHTML = '<p class="favorit-kosong"><i class="far fa-bookmark" style="margin-right:8px;"></i>Belum ada artikel yang difavoritkan.</p>';
+                return;
+            }
+
+            favorit.forEach(artikel => {
+                container.appendChild(buatKartuFavorit(artikel));
+            });
+        }
+
+        // Jalankan saat halaman dimuat
+        renderFavorit();
+
+        /* Reset nav saat resize */
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                const nav = document.querySelector('.nav-links');
+                if (nav) nav.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

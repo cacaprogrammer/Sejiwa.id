@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin Manajemen Artikel</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                    },
+                    colors: {
+                        "sejiwa-dark": "#4A2C18",
+                        "sejiwa-medium": "#6B3E23",
+                        "sejiwa-light": "#A3826F",
+                        "primary-blue": "#4A2C18",
+                        "status-draft": "#FCD34D",
+                        "status-published": "#10B981",
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Sidebar: disembunyikan/tergeser di layar kecil */
+        .sidebar {
+            width: 250px;
+            flex-shrink: 0;
+            background-color: #4A2C18;
+            padding: 2rem 0.5rem;
+            color: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            left: -275px;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: left 0.3s ease-in-out;
+        }
+
+        .sidebar.is-open {
+            left: 0;
+        }
+
+        /* Tombol burger */
+        .menu-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-right: 1rem;
+            color: #4A2C18;
+            display: block;
+            border-radius: 0.375rem;
+            transition: background-color 0.2s;
+        }
+        .menu-toggle:hover {
+            background-color: #e0e0e0;
+        }
+        .menu-toggle svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        /* Overlay di Mobile saat sidebar terbuka */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            display: none;
+        }
+        .overlay.is-active {
+            display: block;
+        }
+
+        /* Area putih konten utama */
+        .main-content-area {
+            flex-grow: 1;
+            padding: 1rem;
+            width: 100%;
+        }
+
+        /* Responsive Breakpoint (Desktop) */
+        @media (min-width: 1024px) {
+            body {
+                flex-direction: row;
+            }
+            .sidebar {
+                position: sticky;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+                z-index: 10;
+                left: 0 !important;
+            }
+            .menu-toggle {
+                display: none;
+            }
+            .main-content-area {
+                padding: 2rem;
+            }
+            .overlay.is-active {
+                display: none;
+            }
+        }
+
+        /* Sidebar navigasi link */
+        .sidebar-header {
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgb(255, 255, 255);
+        }
+        .sidebar-nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .nav-item a {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            color: rgb(255, 255, 255);
+            text-decoration: none;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .nav-item a:hover {
+            background-color: #6B3E23;
+            color: white;
+        }
+        .nav-item .active {
+            background-color: #A3826F;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .icon {
+            fill: currentColor;
+            margin-right: 0.75rem;
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        /* Header */
+        .main-header {
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            position: static;
+        }
+
+        /* Table */
+        .article-table {
+            width: 100%;
+            min-width: 900px;
+            border-collapse: collapse;
+        }
+    </style>
+
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header px-4 pb-4 mb-4 border-b border-white/30">
+            <h1 class="text-xl font-bold">Sejiwa Admin</h1>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item">
+                    <a href="dashboardAdmin1.html" id="navDashboard">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15H9v-5h2v5zm4 0h-2v-5h2v5zm-5-8H9V7h2v2zm4 0h-2V7h2v2z"/></svg>
+                        Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="dashboardAdmin2.html" class="active">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H6c-.55 0-1-.45-1-1v-4h14v4c0 .55-.45 1-1 1zm0-6H5V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v7zM7 9h2v2H7z"/></svg>
+                        Manajemen Artikel
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a href="dashboardAdmin3.html" id="navDataUser">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        Data User
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- OVERLAY -->
+    <div class="overlay" id="sidebarOverlay"></div>
+
+    <!-- AREA KONTEN UTAMA -->
+    <div class="main-content-area">
+
+        <!-- HEADER -->
+        <header class="main-header">
+            <button id="sidebarToggle" class="menu-toggle" aria-controls="sidebar" aria-expanded="false">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
+                </svg>
+            </button>
+        </header>
+
+        <!-- KONTEN UTAMA -->
+        <main>
+            <!-- PAGE TITLE -->
+            <h1 class="text-3xl font-extrabold text-gray-800 mb-6">Manajemen Artikel</h1>
+
+            <!-- TABLE WRAPPER -->
+            <div class="bg-white p-6 rounded-xl shadow">
+
+                <!-- Search & Button -->
+                <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                    <input id="search-input" type="text" placeholder="Cari Judul, Kategori, atau Penulis..." onkeyup="filterArticles()" class="flex-grow p-3 border rounded-lg">
+                    <button id="add-article-btn" class="bg-sejiwa-dark text-white px-6 py-3 rounded-lg font-semibold hover:bg-sejiwa-medium transition">
+                        Tambah Artikel Baru
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <table class="article-table">
+                        <thead>
+                            <tr class="bg-gray-100 text-gray-600 uppercase text-xs">
+                                <th class="p-3 text-left">Judul Artikel</th>
+                                <th class="p-3 text-left hidden sm:table-cell">Kategori</th>
+                                <th class="p-3 text-left hidden md:table-cell">Penulis</th>
+                                <th class="p-3 text-left">Status</th>
+                                <th class="p-3 text-left hidden lg:table-cell">Tanggal Terbit</th>
+                                <th class="p-3 text-center">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="articles-table-body"></tbody>
+                    </table>
+
+                    <div id="no-results" class="hidden text-center py-6 text-gray-500">
+                        Tidak ada artikel yang cocok.
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL -->
+    <div id="custom-alert-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center opacity-0 pointer-events-none transition z-50">
+        <div class="bg-white rounded-xl p-6 w-80 shadow-xl">
+            <h3 id="modal-title" class="text-xl font-bold mb-2 text-gray-800"></h3>
+            <p id="modal-message" class="text-gray-600 mb-4"></p>
+            <button id="modal-ok-btn" class="bg-sejiwa-dark text-white px-4 py-2 rounded-lg font-semibold hover:bg-sejiwa-medium transition">OK</button>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Dummy Data
+        const articles = [
+            { id: 1, title: "Proklamasi Kemerdekaan", category: "Sejarah", author: "Rudianto", status: "Published", publishDate: "2024-11-10" },
+            { id: 2, title: "Biografi Ir. Soekarno", category: "Biografi Tokoh", author: "Anita", status: "Published", publishDate: "2024-11-05" },
+            { id: 3, title: "Peristiwa G30S/PKI", category: "Sejarah", author: "Bambang", status: "Draft", publishDate: "2024-11-15" },
+            { id: 4, title: "Pertempuran Ambarawa", category: "Sejarah", author: "Sari", status: "Draft", publishDate: "2024-11-20" },
+            { id: 5, title: "R.A Kartini", category: "Biografi Tokoh", author: "Dewi", status: "Published", publishDate: "2024-10-28" },
+        ];
+
+        // Sidebar Toggle
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButton = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('is-open');
+                overlay.classList.toggle('is-active');
+                const isExpanded = sidebar.classList.contains('is-open');
+                toggleButton.setAttribute('aria-expanded', isExpanded);
+            }
+
+            if (toggleButton) toggleButton.addEventListener('click', toggleSidebar);
+            if (overlay) overlay.addEventListener('click', toggleSidebar);
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth >= 1024) {
+                    sidebar.classList.remove('is-open');
+                    overlay.classList.remove('is-active');
+                    toggleButton.setAttribute('aria-expanded', 'false');
+                }
+            });
+        });
+
+        // Modal
+        const modal = document.getElementById("custom-alert-modal");
+        const modalTitle = document.getElementById("modal-title");
+        const modalMessage = document.getElementById("modal-message");
+
+        function alertModal(message, title = "Notifikasi") {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modal.classList.remove("opacity-0", "pointer-events-none");
+        }
+
+        document.getElementById("modal-ok-btn").onclick = () => {
+            modal.classList.add("opacity-0", "pointer-events-none");
+        };
+
+        // Render Articles
+        function renderArticles(list) {
+            const tbody = document.getElementById("articles-table-body");
+            tbody.innerHTML = "";
+
+            if (list.length === 0) {
+                document.getElementById("no-results").classList.remove("hidden");
+                return;
+            }
+            document.getElementById("no-results").classList.add("hidden");
+
+            list.forEach(a => {
+                const row = document.createElement("tr");
+                row.className = "border-b border-gray-100 hover:bg-gray-50 transition";
+                row.innerHTML = `
+                    <td class="p-3 font-medium text-gray-800">${a.title}</td>
+                    <td class="p-3 hidden sm:table-cell text-gray-600">${a.category}</td>
+                    <td class="p-3 hidden md:table-cell text-gray-600">${a.author}</td>
+                    <td class="p-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold
+                            ${a.status === "Published" ? "bg-green-500 text-white" : "bg-yellow-300 text-black"}">
+                            ${a.status}
+                        </span>
+                    </td>
+                    <td class="p-3 hidden lg:table-cell text-gray-600">${a.publishDate}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="handleEdit(${a.id})" class="text-sejiwa-dark hover:underline mr-3 font-semibold text-sm">Edit</button>
+                        <button onclick="handleDelete(${a.id})" class="text-red-600 hover:underline font-semibold text-sm">Hapus</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Filter/Search
+        function filterArticles() {
+            const val = document.getElementById("search-input").value.toLowerCase();
+            const filtered = articles.filter(a =>
+                a.title.toLowerCase().includes(val) ||
+                a.category.toLowerCase().includes(val) ||
+                a.author.toLowerCase().includes(val) ||
+                a.status.toLowerCase().includes(val)
+            );
+            renderArticles(filtered);
+        }
+
+        function handleEdit(id) {
+            alertModal(`Anda memilih untuk mengedit artikel ID ${id}`, "Aksi Edit Artikel");
+        }
+
+        function handleDelete(id) {
+            alertModal(`Artikel ID ${id} akan dihapus. Ini hanya simulasi.`, "Aksi Hapus Artikel");
+        }
+
+        // Init
+        renderArticles(articles);
+    </script>
+
+</body>
+</html>

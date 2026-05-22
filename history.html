@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>History</title>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    /* RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      background: #ffffff;
+    }
+
+    /* SIDEBAR */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 240px;
+    height: 100vh;
+    background: #4a2c18;
+    padding: 30px 25px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    transition: transform 0.35s ease-in-out;
+    z-index: 1000;
+}
+
+.sidebar-logo {
+  width: 55px;
+  margin-bottom: 50px;
+}
+
+.sidebar a {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 16px;
+  color: white;
+  text-decoration: none;
+  padding: 14px 5px;
+  margin: 2px 0;
+  border-radius: 10px;
+}
+
+.sidebar a.active {
+  background: rgba(255,255,255,0.15);
+}
+
+.sidebar a:hover {
+  background: rgba(255,255,255,0.12);
+}
+
+.icon-menu {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  margin-right: 14px;
+}
+
+/* HAMBURGER MENU */
+.hamburger {
+  display: none;
+  position: fixed;
+  top: 32px;
+  right: 26px;  /* pindah ke kanan */
+  font-size: 28px;
+  color: #4a2c18;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+
+/* CONTENT WRAPPER */
+.main-wrapper {
+  margin-left: 240px;
+  min-height: 100vh;
+  width: calc(100% - 240px);
+  transition: 0.3s;
+}
+
+.content {
+  padding: 30px 40px;
+  flex: 1;
+}
+
+/* PROFILE HEADER */
+.profile-header {
+  background: white;
+  padding: 18px 22px;
+  border-radius: 10px;
+  box-shadow: 0 0 7px rgba(0,0,0,0.12);
+  margin-bottom: 30px;
+}
+
+.profile-header h3 {
+  font-size: 19px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* PROFILE CARD */
+.profile-card {
+  background: white;
+  padding: 28px 35px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  width: 480px;
+  margin-bottom: 40px;
+}
+
+.profile-img {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #ddd;
+  margin-right: 25px;
+}
+
+.profile-name {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+}
+
+.profile-username {
+  color: #777;
+  font-size: 14px;
+  margin: 4px 0 15px;
+}
+
+.btn-edit {
+  background: #8b3e26;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-edit:hover {
+  opacity: 0.9;
+}
+
+/* HISTORY BOX */
+.history-box {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.12);
+  width: 100%;
+  max-width: 960px;
+}
+
+.history-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th {
+  background: #fafafa;
+  padding: 12px;
+  text-align: left;
+  border-bottom: 2px solid #ddd;
+}
+
+td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.selesai {
+  background: #d8f5d0;
+  color: #3c7c29;
+}
+
+.ditolak {
+  background: #ffe4cc;
+  color: #c25c2e;
+}
+
+.btn-delete {
+  background: #f8cccc;
+  border: none;
+  color: #9b1b1b;
+  padding: 6px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+/* ICON RIWAYAT */
+.icon-riwayat {
+  width: 15px;
+  margin-right: 6px;
+}
+
+.judul-riwayat {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.judul-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.subjudul {
+  font-size: 10px;
+  color: gray;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+
+  .hamburger {
+    display: block;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+  }
+
+  .sidebar.show {
+    transform: translateX(0);
+  }
+
+  .main-wrapper {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .content {
+    padding: 20px;
+  }
+}
+  </style>
+</head>
+
+<body>
+
+<!-- HAMBURGER -->
+<div class="hamburger" id="hamburger">
+  <i class="fas fa-bars"></i>
+</div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <img src="logobenar.png" class="sidebar-logo">
+
+  <a href="#" class="active">
+    <img src="iconamoon_profile.png" class="icon-menu"> Profil
+  </a>
+
+  <a href="#">
+    <img src="Group.png" class="icon-menu"> Keluar
+  </a>
+</div>
+
+<!-- MAIN -->
+<div class="main-wrapper">
+  <div class="content">
+
+    <div class="profile-header">
+      <h3>Profil Saya</h3>
+    </div>
+
+    <div class="profile-card">
+      <img src="https://i.pravatar.cc/160" class="profile-img">
+      <div>
+        <div class="profile-name">Jacob Jones</div>
+        <div class="profile-username">@Jacob.Jones</div>
+        <a href="profile.html"><button class="btn-edit">Ubah Profil</button></a>
+      </div>
+    </div>
+
+    <div class="history-box">
+      <div class="history-title">Riwayat</div>
+
+      <table>
+        <tr>
+          <th>Judul</th>
+          <th>Status</th>
+          <th>Baca Sekarang</th>
+          <th>Durasi</th>
+          <th>Cache</th>
+        </tr>
+
+        <!-- TIDAK ADA PERUBAHAN KONTEN -->
+        <tr>
+          <td class="judul-riwayat">
+            <img src="Vector (5).png" class="icon-riwayat">
+            <div class="judul-wrap">
+              Sumpah Pemuda
+              <div class="subjudul">3 menit</div>
+            </div>
+          </td>
+          <td><span class="badge selesai">Selesai</span></td>
+          <td>Baca Sekarang</td>
+          <td>30 menit</td>
+          <td><button class="btn-delete">Hapus</button></td>
+        </tr>
+
+        <tr>
+          <td class="judul-riwayat">
+            <img src="Vector (5).png" class="icon-riwayat">
+            <div class="judul-wrap">
+              Peristiwa G30S/PKI
+              <div class="subjudul">4 menit</div>
+            </div>
+          </td>
+          <td><span class="badge selesai">Selesai</span></td>
+          <td>Baca Sekarang</td>
+          <td>50 menit</td>
+          <td><button class="btn-delete">Hapus</button></td>
+        </tr>
+
+        <tr>
+          <td class="judul-riwayat">
+            <img src="Vector (5).png" class="icon-riwayat">
+            <div class="judul-wrap">
+              Supersemar
+              <div class="subjudul">5 menit</div>
+            </div>
+          </td>
+          <td><span class="badge ditolak">Dijeda</span></td>
+          <td>Baca Sekarang</td>
+          <td>40 menit</td>
+          <td><button class="btn-delete">Hapus</button></td>
+        </tr>
+
+        <tr>
+          <td class="judul-riwayat">
+            <img src="Vector (5).png" class="icon-riwayat">
+            <div class="judul-wrap">
+              Perjanjian Renville
+              <div class="subjudul">6 menit</div>
+            </div>
+          </td>
+          <td><span class="badge ditolak">Dijeda</span></td>
+          <td>Baca Sekarang</td>
+          <td>45 menit</td>
+          <td><button class="btn-delete">Hapus</button></td>
+        </tr>
+
+        <tr>
+          <td class="judul-riwayat">
+            <img src="Vector (5).png" class="icon-riwayat">
+            <div class="judul-wrap">
+              Peristiwa Malari
+              <div class="subjudul">5 menit</div>
+            </div>
+          </td>
+          <td><span class="badge ditolak">Dijeda</span></td>
+          <td>Baca Sekarang</td>
+          <td>50 menit</td>
+          <td><button class="btn-delete">Hapus</button></td>
+        </tr>
+
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const hamburger = document.getElementById("hamburger");
+  const sidebar = document.getElementById("sidebar");
+
+  hamburger.addEventListener("click", () => {
+    sidebar.classList.toggle("show");
+  });
+</script>
+
+</body>
+</html>

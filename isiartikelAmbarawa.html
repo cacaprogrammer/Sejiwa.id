@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isi Ambarawa</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; line-height: 1.6; background-color: #f7f7f7; }
+        header {
+            height: 50px; background-color: #4a2c18; color: #f7f7f7;
+            padding: 0 15px; display: flex; justify-content: space-between;
+            align-items: center; position: sticky; top: 0; left: 0; width: 100%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1000;
+        }
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute; top: 35px; left: -20px; background: #724636;
+            border: none; width: 150px; padding: 7px; display: none;
+            flex-direction: column; border-radius: 8px; gap: 0px;
+        }
+        .dropdown-inner { background: #ffffff; border-radius: 8px; border: 2px solid #724636; padding: 2px 0; overflow: hidden; }
+        .dropdown-inner a { color: #000; padding: 2px 0; font-size: 14px; display: block; text-align: center; }
+        .dropdown-separator { height: 8px; background: #724636; margin: 0; }
+        .logo { display: flex; align-items: center; }
+        .logo-img { height: 40px; width: auto; }
+        .logo-text-img { height: 70px; width: auto; margin-left: -12px; position: relative; top: -2px; }
+        nav ul { display: flex; list-style: none; padding: 0; }
+        nav ul li { margin-left: 20px; }
+        nav ul li a { text-decoration: none; color: inherit; font-size: 0.95em; font-weight: bold; transition: 0.3s; }
+        nav ul li a:hover { color: #c9a68a; }
+        .user-icon i { font-size: 1.6em; cursor: pointer; margin-right: 15px; }
+        .user-icon a { color: #ffffff; }
+        .user-icon i:hover { color: #c9a68a; }
+        .content-container {
+            max-width: 1400px; margin: 30px auto; padding: 25px;
+            background-color: #fff; box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            border-radius: 10px; position: relative; top: -30px;
+        }
+        .article-title-bar { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+        .main-title { font-size: 40px; font-weight: 700; color: #000; line-height: 1; margin: 0; padding-bottom: 35px; position: relative; top: 40px; }
+        .site-name-right { color: #000; font-weight: 600; font-size: 16px; line-height: 1; bottom: -10px; position: relative; left: -5px; }
+        .separator { border: 0; height: 3px; background-color: #000; margin-top: 5px; margin-bottom: 20px; }
+        .article-content { display: flex; gap: 30px; }
+        .left-column { flex-basis: 300px; flex-shrink: 0; display: flex; flex-direction: column; gap: 15px; }
+        .article-card-wrapper {
+            border: 1px solid #ddd; padding: 15px; background-color: #fff;
+            border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column; gap: 10px;
+            width: 280px; max-height: 580px; position: relative;
+        }
+        .image-box { border: none; padding: 0; background-color: transparent; border-radius: 6px; overflow: hidden; box-shadow: none; position: relative; flex-grow: 1; }
+        .main-article-image { width: 100%; height: 100%; object-fit: cover; border-radius: 6px; filter: brightness(0.8); }
+        .article-title-card {
+            background-color: #DAC6BB; padding: 10px 15px; text-align: center;
+            font-weight: 700; font-size: 16px; border-radius: 6px; color: #000;
+            cursor: pointer; transition: background-color 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 42px;
+        }
+        .article-title-card:hover { background-color: #e5e5e5; }
+        .btn-bookmark {
+            position: absolute; bottom: 10px; right: 10px; z-index: 5;
+            background: none; border: none; cursor: pointer; padding: 0;
+            width: 32px; height: 32px; display: flex; align-items: center;
+            justify-content: center; transition: transform 0.2s;
+        }
+        .btn-bookmark:hover { transform: scale(1.2); }
+        .btn-bookmark .fa-bookmark { font-size: 1.5em; color: #4a2c18; transition: color 0.2s; }
+        .btn-bookmark.active .fa-bookmark { color: #e67e22; }
+        .toast {
+            position: fixed; bottom: 30px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background-color: #4a2c18; color: #fff;
+            padding: 10px 22px; border-radius: 30px;
+            font-size: 0.9em; font-weight: bold;
+            opacity: 0; transition: opacity 0.3s, transform 0.3s;
+            z-index: 9999; pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        .rating-box {
+            background-color: #4A2C18; color: white;
+            padding: 10px; text-align: center; font-weight: bold;
+            cursor: pointer; border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: background-color 0.2s, transform 0.15s;
+            display: flex; justify-content: center; align-items: center;
+            gap: 8px; width: 249px; position: relative; left: 14px;
+            border: none; font-size: 14px;
+        }
+        .rating-box:hover { background-color: #6d4c41; transform: translateY(-1px); }
+        .rating-box:active { transform: translateY(0); }
+        .rating-icon { width: 20px; height: 20px; object-fit: contain; }
+        .right-column-description {
+            flex-grow: 1; height: 600px; overflow-y: scroll;
+            padding-right: 20px; font-size: 16px; text-align: justify;
+        }
+        .right-column-description p { margin-bottom: 20px; }
+        @media (max-width: 768px) {
+            .article-content { flex-direction: column; gap: 20px; }
+            .left-column { flex-basis: auto; }
+            .main-article-image { height: 200px; }
+            .right-column-description { height: auto; overflow-y: visible; padding-right: 0; }
+            .content-container { padding: 15px; }
+            .rating-box { width: 100%; left: 0; }
+            .article-card-wrapper { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logobenar.png" alt="logo PJBL" class="logo-img">
+            <img src="sejput.png" alt="namaweb text" class="logo-text-img">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="landingpagepilihanfix.html">Beranda</a></li>
+                <li class="dropdown">
+                    <a href="#" onclick="toggleDropdown(event)">Artikel ▾</a>
+                    <div class="dropdown-menu" id="dropdown-menu">
+                        <div class="dropdown-inner"><a href="daftarsearchSejarah.html">Sejarah</a></div>
+                        <div class="dropdown-separator"></div>
+                        <div class="dropdown-inner"><a href="daftarsearchBiografi.html">Biografi Tokoh</a></div>
+                    </div>
+                </li>
+                <li><a href="favorit.html">Favorit</a></li>
+                <li><a href="rating.html">Ulasan</a></li>
+            </ul>
+        </nav>
+        <div class="user-icon">
+            <a href="history.html"><i class="fas fa-user-circle"></i></a>
+        </div>
+    </header>
+
+    <div class="toast" id="toast"></div>
+
+    <div class="content-container">
+        <div class="article-title-bar">
+            <h2 class="main-title">SEJARAH</h2>
+            <span class="site-name-right">detik.com</span>
+        </div>
+        <hr class="separator">
+
+        <div class="article-content">
+            <div class="left-column">
+                <div class="article-card-wrapper">
+                    <div class="image-box">
+                        <img src="amb.jpg" alt="Sampul Artikel Pertempuran Ambarawa" class="main-article-image">
+                    </div>
+                    <div class="article-title-card">Pertempuran Ambarawa</div>
+                    <button class="btn-bookmark" id="btn-bookmark" onclick="toggleFavorit()" title="Tambah ke Favorit">
+                        <i class="fa-bookmark" id="bookmark-icon"></i>
+                    </button>
+                </div>
+
+                <!-- ✅ Tombol Rating — onclick bukaRating(), bukan <a href> langsung -->
+                <button class="rating-box" onclick="bukaRating()">
+                    <span>Rating &amp; Ulasan</span>
+                    <img src="mdi_read-more-outline.png" alt="Ikon Rating" class="rating-icon">
+                </button>
+            </div>
+
+            <div class="right-column-description" id="article-body">
+                <p>Palagan Ambarawa atau Pertempuran Ambarawa adalah pertempuran yang terjadi antara Tentara Nasional Indonesia yang baru saja dibentuk dan Angkatan Darat Britania Raya dengan pasukan Belanda yang terjadi antara 20 Oktober 1945 dan 15 Desember 1945 di Kabupaten Semarang dan Kabupaten Magelang di Jawa Tengah, Indonesia.</p>
+                <p>Di zaman modern, 15 Desember diperingati sebagai Hari Infanteri Nasional Indonesia.</p>
+                <p>Pada tanggal 19 Oktober 1945, pasukan Sekutu di bawah komando Letnan Kolonel Edwardes mendarat di Semarang untuk melucuti senjata pasukan Jepang dan membebaskan tawanan perang yang masih ditahan di kamp-kamp di Jawa Tengah. Awalnya, pasukan tersebut disambut baik oleh pihak Indonesia karena kehadiran mereka menghentikan serangan terhadap mereka oleh pasukan Jepang sebagai balasan atas pembantaian sekitar 200 warga sipil Jepang yang dipenjara oleh "ekstremis" Indonesia di dekat Semarang. Pasukan tersebut diperintahkan untuk tetap netral dalam "masalah politik". Dalam sebuah pertemuan dengan Gubernur Jawa Tengah Wongsonegoro, dicapai kesepakatan bahwa polisi Indonesia akan diizinkan untuk menyimpan senjata mereka, tetapi warga sipil akan dilucuti senjatanya. Sebagai imbalannya, mereka setuju untuk menyediakan bahan makanan dan kebutuhan lainnya untuk kelancaran tugas Sekutu, sementara Sekutu berjanji untuk tidak mengganggu kedaulatan pemerintah saat itu.</p>
+                <p>Namun, ketika pasukan Sekutu dan NICA mulai membebaskan dan mempersenjatai tawanan perang Belanda yang dibebaskan di Ambarawa dan Magelang, banyak penduduk setempat yang marah. Hubungan semakin memburuk ketika Sekutu mulai melucuti senjata anggota Tentara Nasional Indonesia. Resimen Kedu Tengah 1 di bawah komando Letnan Kolonel M. Sarbini mulai mengepung pasukan Sekutu yang ditempatkan di Magelang sebagai balasan atas upaya pelucutan senjata mereka. Presiden Indonesia Soekarno campur tangan dalam situasi tersebut untuk meredakan ketegangan, dan Sekutu secara diam-diam meninggalkan Magelang ke benteng mereka di Ambarawa. Resimen Sarbini mengikuti Sekutu dalam pengejaran, dan kemudian bergabung dengan pasukan Indonesia lainnya dari Ambarawa, Suruh, dan Surakarta. Mundurnya pasukan Sekutu terhenti di Desa Jambu karena dihadang oleh pasukan Angkatan Muda di bawah pimpinan Oni Sastrodihardjo. Pasukan Sekutu kemudian diusir dari Desa Jambu oleh pasukan gabungan Tentara Nasional Indonesia.</p>
+                <p>Di Desa Ngipik, pasukan Sekutu kembali dicegat oleh Batalion 1 Soerjosoempeno di Ngipik dan dipaksa mundur lagi oleh Tentara Nasional Indonesia, setelah berusaha menguasai dua desa di sekitar Ambarawa. Pasukan Indonesia di bawah komando Letnan Kolonel Isdiman mencoba membebaskan kedua desa tersebut, tetapi Isdiman tewas dalam pertempuran sebelum bala bantuan tiba. Sejak kematian Letnan Kolonel Isdiman, Panglima Divisi 5 Banyumas, Kolonel Soedirman merasa kehilangan salah satu perwira terbaiknya dan dia segera turun ke medan untuk memimpin pertempuran. Kolonel Soedirman, bersumpah untuk membalas kematian Isdiman dan memanggil bala bantuan untuk mengepung posisi Sekutu di Jawa Tengah. Tanpa sepengetahuan prajuritnya, ia telah terpilih sebagai Panglima Angkatan Perang pada tanggal 12 November secara in absentia, karena ia masih bersama divisinya.</p>
+                <p><b>Pertempuran</b></p>
+                <p>Pada pagi hari tanggal 23 November 1945, pasukan Indonesia mulai menembaki pasukan Sekutu yang ditempatkan di Ambarawa. Serangan balik dari Sekutu memaksa Tentara Nasional Indonesia mundur ke Desa Bedono.</p>
+                <p>Pada tanggal 11 Desember 1945, Soedirman mengadakan pertemuan dengan beberapa komandan Angkatan Darat. Keesokan harinya pada pukul 4:30 pagi, Angkatan Darat melancarkan serangan terhadap Sekutu di Ambarawa. Artileri Indonesia menggempur posisi Sekutu, yang kemudian diserbu oleh infanteri. Ketika jalan raya Semarang-Ambarawa direbut oleh pasukan Indonesia, Soedirman segera memerintahkan pasukannya untuk memotong jalur pasokan pasukan Sekutu yang tersisa dengan menggunakan manuver penjepit. Kehadiran Kolonel Soedirman memberikan semangat baru bagi pasukan Indonesia. Koordinasi terjalin antar komando sektor dan pengepungan terhadap musuh semakin ketat. Taktik yang diterapkan adalah serangan dadakan secara serentak di semua sektor. Bala bantuan terus berdatangan dari Yogyakarta, Surakarta, Salatiga, Purwokerto, Magelang, Semarang, dan lain-lain. Pertempuran berakhir empat hari kemudian pada tanggal 15 Desember 1945, ketika Indonesia berhasil menguasai kembali Ambarawa dan Sekutu mundur ke Semarang.</p>
+                <p><b>Akibat</b></p>
+                <p>Hanya tiga hari setelah kemenangan, Soedirman dipromosikan menjadi mayor jenderal dan pemilihannya sebagai Panglima Besar Tentara Keamanan Rakyat (TKR), yang berlaku surut sejak tanggal 12 November, dikukuhkan, menggantikan Oerip Soemohardjo, pemimpin sementara angkatan perang, yang ditunjuk sebagai kepala staf.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // DATA ARTIKEL INI — khusus Pertempuran Ambarawa
+        // ============================================================
+        const ARTIKEL_DATA = {
+            id: 'pertempuran-ambarawa',
+            judul: 'Pertempuran Ambarawa',
+            gambar: 'amb.jpg',
+            link: 'isiartikelAmbarawa.html'  // ✅ nama file yang benar
+        };
+
+        const FAVORIT_KEY = 'sejiwa_favorit';
+        const AKTIF_KEY   = 'sejiwa_aktif_artikel';
+
+        // ─── NAVBAR ───
+        function toggleDropdown(event) {
+            event.preventDefault();
+            const menu = document.getElementById('dropdown-menu');
+            menu.style.display = (menu.style.display === 'flex') ? 'none' : 'flex';
+        }
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('dropdown-menu');
+            const dropdown = document.querySelector('.dropdown');
+            if (dropdown && !dropdown.contains(e.target)) menu.style.display = 'none';
+        });
+
+        // ─── TOAST ───
+        function showToast(pesan) {
+            const toast = document.getElementById('toast');
+            toast.textContent = pesan;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // ─── FAVORIT ───
+        function getFavorit() {
+            try { return JSON.parse(localStorage.getItem(FAVORIT_KEY)) || []; } catch { return []; }
+        }
+        function saveFavorit(list) { localStorage.setItem(FAVORIT_KEY, JSON.stringify(list)); }
+        function isFavorit() { return getFavorit().some(f => f.id === ARTIKEL_DATA.id); }
+        function updateBookmarkIcon() {
+            const btn  = document.getElementById('btn-bookmark');
+            const icon = document.getElementById('bookmark-icon');
+            if (isFavorit()) {
+                btn.classList.add('active');
+                icon.className = 'fas fa-bookmark';
+                btn.title = 'Hapus dari Favorit';
+            } else {
+                btn.classList.remove('active');
+                icon.className = 'far fa-bookmark';
+                btn.title = 'Tambah ke Favorit';
+            }
+        }
+        function toggleFavorit() {
+            let favorit = getFavorit();
+            if (isFavorit()) {
+                favorit = favorit.filter(f => f.id !== ARTIKEL_DATA.id);
+                saveFavorit(favorit);
+                updateBookmarkIcon();
+                showToast('Dihapus dari Favorit');
+            } else {
+                favorit.push({ ...ARTIKEL_DATA, progress: hitungProgress() });
+                saveFavorit(favorit);
+                updateBookmarkIcon();
+                showToast('Ditambahkan ke Favorit!');
+            }
+        }
+
+        // ─── PROGRESS BACA ───
+        function hitungProgress() {
+            const el = document.getElementById('article-body');
+            if (!el) return 0;
+            const scrollHeight = el.scrollHeight - el.clientHeight;
+            if (scrollHeight <= 0) return 100;
+            return Math.round((el.scrollTop / scrollHeight) * 100);
+        }
+        function simpanProgress() {
+            const favorit = getFavorit();
+            const index = favorit.findIndex(f => f.id === ARTIKEL_DATA.id);
+            if (index !== -1) { favorit[index].progress = hitungProgress(); saveFavorit(favorit); }
+        }
+        const articleBody = document.getElementById('article-body');
+        if (articleBody) articleBody.addEventListener('scroll', simpanProgress);
+
+        // ─── ✅ FUNGSI UTAMA: Simpan artikel Ambarawa lalu buka rating.html ───
+        function bukaRating() {
+            localStorage.setItem(AKTIF_KEY, JSON.stringify({
+                id:     ARTIKEL_DATA.id,
+                judul:  ARTIKEL_DATA.judul,
+                gambar: ARTIKEL_DATA.gambar,
+                link:   ARTIKEL_DATA.link
+            }));
+            window.location.href = 'rating.html';
+        }
+
+        // Inisialisasi
+        updateBookmarkIcon();
+    </script>
+</body>
+</html>
