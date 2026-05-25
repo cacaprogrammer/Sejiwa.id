@@ -45,7 +45,14 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah') {
     $judul    = trim($_POST['judul']);
     $kategori = $_POST['kategori'];
     $status   = $_POST['status'];
-    $penulis  = trim($_POST['penulis']) ?: 'Admin';
+    
+    // OTOMATISASI: Jika role penulis, kunci nama berdasarkan session login. Jika admin, bisa input manual.
+    if ($_SESSION['role'] === 'penulis') {
+        $penulis = $_SESSION['nama_lengkap'];
+    } else {
+        $penulis = trim($_POST['penulis']) ?: $_SESSION['nama_lengkap'];
+    }
+    
     $preview  = trim($_POST['preview']);
     $konten   = trim($_POST['konten']);
     $slug     = buatSlug($judul);
@@ -66,8 +73,11 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah') {
 
     if ($tipe !== 'error') {
         $stmt = $conn->prepare("INSERT INTO tb_artikel (judul, slug, konten, preview, penulis, thumbnail, kategori, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        $admin_id = $_SESSION['id'] ?? 1;
-        $stmt->bind_param("ssssssssi", $judul, $slug, $konten, $preview, $penulis, $thumbnail, $kategori, $status, $admin_id);
+        
+        // OTOMATISASI: created_by mengambil ID user yang sedang aktif dari session
+        $user_id = $_SESSION['id'] ?? 1;
+        
+        $stmt->bind_param("ssssssssi", $judul, $slug, $konten, $preview, $penulis, $thumbnail, $kategori, $status, $user_id);
         if ($stmt->execute()) { $pesan = 'Artikel berhasil ditambahkan!'; $tipe = 'sukses'; }
         else { $pesan = 'Gagal: ' . $stmt->error; $tipe = 'error'; }
     }
@@ -81,7 +91,14 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'edit') {
     $judul    = trim($_POST['judul']);
     $kategori = $_POST['kategori'];
     $status   = $_POST['status'];
-    $penulis  = trim($_POST['penulis']) ?: 'Admin';
+    
+    // OTOMATISASI: Jika role penulis, nama penulis saat edit dikunci menggunakan data session.
+    if ($_SESSION['role'] === 'penulis') {
+        $penulis = $_SESSION['nama_lengkap'];
+    } else {
+        $penulis = trim($_POST['penulis']) ?: 'Admin';
+    }
+    
     $preview  = trim($_POST['preview']);
     $konten   = trim($_POST['konten']);
 

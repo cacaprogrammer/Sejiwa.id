@@ -1,10 +1,12 @@
 <?php
 session_start();
 
-// Kalau sudah login, langsung redirect sesuai role
+// 1. Jika user sudah login, langsung redirect otomatis sesuai folder 'pages'
 if (isset($_SESSION['username'])) {
     if ($_SESSION['role'] === 'admin') {
         header("Location: dashboardAdmin.php");
+    } elseif ($_SESSION['role'] === 'penulis') {
+        header("Location: pages/artikel.php"); // DIPERBAIKI: Mengarah ke folder pages dan file artikel.php
     } else {
         header("Location: landingpagepilihanfix.php");
     }
@@ -27,7 +29,7 @@ if (isset($_POST['submit'])) {
     $user  = $hasil->fetch_assoc();
 
     if ($user) {
-        // Verifikasi password hash (bcrypt sesuai modul 16)
+        // Verifikasi password hash
         if (password_verify($password, $user['password'])) {
             // Simpan data ke session
             $_SESSION['id']           = $user['id'];
@@ -35,9 +37,11 @@ if (isset($_POST['submit'])) {
             $_SESSION['nama_lengkap'] = $user['nama_lengkap'];
             $_SESSION['role']         = $user['role'];
 
-            // Redirect sesuai role
+            // 2. Redirect setelah BERHASIL login
             if ($user['role'] === 'admin') {
                 header("Location: dashboardAdmin.php");
+            } elseif ($user['role'] === 'penulis') {
+                header("Location: pages/artikel.php"); // DIPERBAIKI: Mengarah ke folder pages dan file artikel.php
             } else {
                 header("Location: landingpagepilihanfix.php");
             }
