@@ -1,3 +1,18 @@
+<?php
+session_start();
+
+// Kalau belum login, redirect ke halaman login
+if (!isset($_SESSION['username'])) {
+    header("Location: loginpage.php");
+    exit();
+}
+
+// Kalau yang login adalah admin, redirect ke dashboard admin
+if ($_SESSION['role'] === 'admin') {
+    header("Location: dashboardAdmin.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -124,7 +139,7 @@
 
         /* Hamburger Menu & Sidebar Styling (Mobile) */
         .hamburger-menu {
-            display: none; /* Default: hidden on desktop */
+            display: none;
             background: none;
             border: none;
             color: #f7f7f7;
@@ -136,7 +151,7 @@
 
         .sidebar {
             height: 100%;
-            width: 0; /* Awalnya tersembunyi */
+            width: 0;
             position: fixed;
             z-index: 1001;
             top: 0;
@@ -344,8 +359,6 @@
             color: #f0f0f0;
         }
 
-
-        /*bintang*/
         .rating-stars {
             font-size: 1.5rem; 
             color: #fbbf24; 
@@ -353,10 +366,8 @@
             letter-spacing: 2px;
             position: relative; 
             top: -10px; 
-        
         }
         
-        /* Bintang yang tidak terisi (Unicode Bintang Kosong) - Tema Gelap */
         .rating-stars .unfilled-star {
             color: rgba(255, 255, 255, 0.5); 
         }
@@ -387,9 +398,8 @@
         .card button img {
             width: 18px;    
             height: 18px;   
-            margin-left: 5px; /* Jarak antara teks dan gambar */
+            margin-left: 5px;
             object-fit: contain;
-        
         }
 
         .container {
@@ -415,10 +425,8 @@
             width: 250px;
             height: 180px;
             object-fit: cover;
-            
         }
 
-        /* sudut */
         .img1 {
             border-top-left-radius: 60px;
             box-shadow: -13px -15px 0px #4a2c18;
@@ -453,7 +461,6 @@
             line-height: 1.6;
         }
 
-
         .footer {
             background-color: #4a2c18; 
             color: #fff; 
@@ -473,7 +480,6 @@
             padding: 0 10px;
         }
         
-        /* logo info*/
         .logo-info {
             display: flex;
             flex-direction: column;
@@ -490,7 +496,6 @@
             width: 40px; 
             height: 40px;
             margin-right: 8px;
-             
         }
 
         .logo-title h3 {
@@ -525,14 +530,11 @@
             color: inherit;
         }
         
-        /* menu tentang kita*/
-        
         .middle-section {
             display: flex;
             flex-direction: column;
         }
         
-        /*Beranda, Artikel*/
         .navigasi-horizontal {
             display: flex;
             justify-content: space-between; 
@@ -549,7 +551,6 @@
             padding-right: 20px; 
         }
         
-        /* Judul Tentang Kita" */
         .middle-section h4 {
             color: white;
             margin-top: 0;
@@ -558,7 +559,6 @@
             font-size: 16px;
         }
         
-        /*kolom*/
         .kontak .item-kontak {
             margin-bottom: 15px;
         }
@@ -575,7 +575,6 @@
             align-items: center;
         }
         
-        /*Ikon Telepon & Email */
         .kontak .item-kontak i {
             margin-right: 8px;
             font-size: 18px;
@@ -586,9 +585,6 @@
             text-decoration: none;
         }
 
-        /* --- MEDIA QUERIES UNTUK RESPONSIVITAS --- */
-
-        /* Umum: Padding dan Margin */
         @media (max-width: 1024px) {
             .hero-section, 
             .rekomendasi-section {
@@ -596,22 +592,20 @@
             }
         }
         
-        /* Breakpoint untuk Navbar/Hamburger */
         @media (max-width: 1024px) {
             nav, .user-icon {
-                display: none; /* Sembunyikan navigasi desktop dan ikon user */
+                display: none;
             }
 
             .hamburger-menu {
-                display: block; /* Tampilkan ikon hamburger */
+                display: block;
             }
 
             .sidebar {
-                width: 0; /* Pastikan tersembunyi */
+                width: 0;
             }
         }
 
-        /* Hero Section (Tablet ke bawah) */
         @media (max-width: 768px) {
             .hero-section {
                 flex-direction: column;
@@ -653,10 +647,9 @@
             }
         }
 
-        /* Mengapa Memilih Kami? Section - agar gambar tetap 2x2 */
         @media (max-width: 900px) {
             .container {
-                flex-direction: column; /* Tumpuk blok gambar dan blok teks */
+                flex-direction: column;
                 gap: 30px;
                 padding: 30px 20px;
             }
@@ -665,12 +658,10 @@
                 grid-template-columns: repeat(2, 1fr);
                 gap: 15px;
                 width: 100%; 
-                /* Pusatkan blok gambar jika lebarnya kurang dari 100% */
                 margin: 0 auto; 
             }
 
             .images img {
-                /* Sesuaikan ukuran gambar agar tetap proporsional */
                 width: 100%;
                 height: auto;
                 min-height: 120px;
@@ -678,7 +669,6 @@
                 object-fit: cover;
             }
             
-            /* Pastikan sudut kustom dan bayangan tetap ada */
             .img1 { border-top-left-radius: 60px; box-shadow: -13px -15px 0px #4a2c18; }
             .img2 { border-top-right-radius: 60px; border-bottom-left-radius: 0; }
             .img3 { border-bottom-left-radius: 60px; border-top-right-radius: 0; }
@@ -689,14 +679,12 @@
             }
         }
 
-        /* Rekomendasi Section (Card scroll tetap baik, hanya padding) */
         @media (max-width: 640px) {
             .rekomendasi-section {
                 padding: 20px;
             }
         }
 
-        /* Footer (Mobile) */
         @media (max-width: 768px) {
             .footer-container {
                 grid-template-columns: 1fr; 
@@ -717,12 +705,11 @@
 <body>
     <header>
         <div class="logo">
-            <img src="logobenar.png"
-            alt="logo PJBL" class="logo-img">
-            <img src="sejput.png"
-            alt="namaweb text" class="logo-text-img">
+            <img src="logobenar.png" alt="logo PJBL" class="logo-img">
+            <img src="sejput.png" alt="namaweb text" class="logo-text-img">
         </div>
-         <!-- Hamburger Menu (Mobile) -->
+
+        <!-- Hamburger Menu (Mobile) -->
         <button class="hamburger-menu" id="hamburger-btn">
             <i class="fas fa-bars"></i>
         </button>
@@ -730,29 +717,28 @@
         <!-- Navigasi Desktop -->
         <nav class="desktop-nav">
             <ul>
-                <li><a href="landingpagepilihanfix.html">Beranda</a></li>
+                <li><a href="landingpagepilihanfix.php">Beranda</a></li>
                 <li class="dropdown">
                     <a href="#" onclick="toggleDropdown(event)">Artikel ▾</a>
-
-
                     <div class="dropdown-menu" id="dropdown-menu">
                         <div class="dropdown-inner">
-                            <a href="daftarsearchSejarah.html">Sejarah</a></div>
-                            <div class="dropdown-separator"></div>
-                            <div class="dropdown-inner">
+                            <a href="daftarsearchSejarah.html">Sejarah</a>
+                        </div>
+                        <div class="dropdown-separator"></div>
+                        <div class="dropdown-inner">
                             <a href="daftarsearchBiografi.html">Biografi Tokoh</a>
                         </div>
                     </div>
-
                 </li>
-                <li><a href="favorit.html">Favorit</a></li>
-                <li><a href="rating.html">Ulasan</a></li>
+                <li><a href="favorit.php">Favorit</a></li>
+                <li><a href="rating.php">Ulasan</a></li>
             </ul>
         </nav>
-        <!-- User Icon Desktop -->
+
+        <!-- User Icon Desktop — klik ke profile/history -->
         <div class="user-icon">
-            <a href="history.html">
-            <i class="fas fa-user-circle"></i>
+            <a href="history.php" title="<?= htmlspecialchars($_SESSION['nama_lengkap']) ?>">
+                <i class="fas fa-user-circle"></i>
             </a>
         </div>
     </header>
@@ -763,12 +749,12 @@
         <div class="sidebar-content">
             <!-- Icon Profile di dalam Sidebar -->
             <div class="sidebar-user-icon">
-                <a href="loginpage.html" onclick="closeSidebar()">
-                    <i class="fas fa-user-circle"></i> Profil Pengguna
+                <a href="profile.php" onclick="closeSidebar()">
+                    <i class="fas fa-user-circle"></i> <?= htmlspecialchars($_SESSION['nama_lengkap']) ?>
                 </a>
             </div>
             
-            <a href="landingpagepilihanfix.html" onclick="closeSidebar()">Beranda</a>
+            <a href="landingpagepilihanfix.php" onclick="closeSidebar()">Beranda</a>
             
             <div class="dropdown-sidebar">
                 <a href="#" onclick="toggleDropdownSidebar(event)">Artikel ▾</a>
@@ -779,22 +765,25 @@
                 </div>
             </div>
 
-            <a href="favorit.html" onclick="closeSidebar()">Favorit</a>
-            <a href="rating.html" onclick="closeSidebar()">Ulasan</a>
+            <a href="favorit.php" onclick="closeSidebar()">Favorit</a>
+            <a href="rating.php" onclick="closeSidebar()">Ulasan</a>
+            <a href="logout.php" onclick="closeSidebar()" style="color:#ffccaa;">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
         </div>
     </div>
 
-
     <div class="hero-section">
         <div class="hero-text">
-            <h1>EXPLORE SEJARAH BANGSA INDONESIA </h1>
+            <h1>EXPLORE SEJARAH BANGSA INDONESIA</h1>
             <p>Explore Sejarah Indonesia, 
                 menghadirkan artikel-artikel menarik yang mengajak Anda 
                 menyelami kisah-kisah epik bangsa. 
                 Temukan peristiwa bersejarah dan tokoh penting yang 
                 membentuk Indonesia seperti yang kita kenal hari ini.</p>
-                <a href="viewmore.html">
-            <button class="hero-button">Lihat Lebih Banyak</button></a>
+            <a href="viewmore.html">
+                <button class="hero-button">Lihat Lebih Banyak</button>
+            </a>
         </div>
         <div class="image-container">
             <div class="left-panel">
@@ -804,71 +793,58 @@
                 <img src="candi2.jpg" alt="Candi Borobudur" class="top-image">
                 <img src="candi3.jpg" alt="Candi Prambanan" class="bottom-image">
             </div>
-            
         </div>
     </div>
-     <section class="rekomendasi-section">
+
+    <section class="rekomendasi-section">
         <h2>Rekomendasi Artikel</h2>
         <p>Temukan lebih banyak hal menarik!</p>
 
         <div class="cards-container">
-            
             <div class="card">
                 <img src="cover1.jpg" alt="Proklamasi Kemerdekaan">
                 <h3>Proklamasi Kemerdekaan</h3>
-                <div class="rating-stars">
-                            ★★★★★<span class="unfilled-star"></span>
-                        </div>
+                <div class="rating-stars">★★★★★<span class="unfilled-star"></span></div>
                 <a href="sampulartikelproklamasi.html">
-    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
-</a>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                </a>
             </div>
             
             <div class="card">
                 <img src="cover2.jpg" alt="Bandung Lautan Api">
                 <h3>Bandung Lautan Api</h3>
-                <div class="rating-stars">
-                            ★★★★<span class="unfilled-star">★</span>
-                        </div>
+                <div class="rating-stars">★★★★<span class="unfilled-star">★</span></div>
                 <a href="sampulartikelbandung.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
             
             <div class="card">
                 <img src="cover3.jpg" alt="G30S/PKI">
                 <h3>Peristiwa G30S/PKI</h3>
-                <div class="rating-stars">
-                            ★★★★★<span class="unfilled-star"></span>
-                        </div>
+                <div class="rating-stars">★★★★★<span class="unfilled-star"></span></div>
                 <a href="sampulartikelG30.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
             
             <div class="card">
                 <img src="cover4.jpg" alt="Sumpah Pemuda">
                 <h3>Sumpah Pemuda</h3>
-                <div class="rating-stars">
-                            ★★★★★<span class="unfilled-star"></span>
-                        </div>
+                <div class="rating-stars">★★★★★<span class="unfilled-star"></span></div>
                 <a href="sampulartikelsumpahp.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
 
             <div class="card">
                 <img src="cover5.jpg" alt="pertempuran ambarawa">
                 <h3>Pertempuran Ambarawa</h3>
-                <div class="rating-stars">
-                            ★★★★<span class="unfilled-star">★</span>
-                        </div>
+                <div class="rating-stars">★★★★<span class="unfilled-star">★</span></div>
                 <a href="sampulartikelAmbarawa.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
-            
-            
         </div>
     </section>
 
@@ -877,12 +853,11 @@
         <p>Temukan lebih banyak hal menarik!</p>
 
         <div class="cards-container">
-            
             <div class="card">
                 <img src="tokoh1.jpg" alt="Bung Tomo">
                 <h3>Bung Tomo</h3>
                 <a href="sampulBungtomo.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
             
@@ -890,7 +865,7 @@
                 <img src="tokoh2.jpg" alt="Jendral Soedirman">
                 <h3>Jendral Soedirman</h3>
                 <a href="sampulSoedirman.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
             
@@ -898,7 +873,7 @@
                 <img src="tokoh3.jpg" alt="Ir.Soekarno">
                 <h3>Ir.Sukarno</h3>
                 <a href="sampulSoekarno.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
             
@@ -906,49 +881,49 @@
                 <img src="tokoh4.jpg" alt="hatta">
                 <h3>Mohammad Hatta</h3>
                 <a href="sampulhatta.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
 
             <div class="card">
-                <img src="tokoh5.jpg" alt="Artikel Tambahan 5">
+                <img src="tokoh5.jpg" alt="Dr.Soetomo">
                 <h3>Dr.Soetomo</h3>
                 <a href="sampulSoetomo.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
             
             <div class="card">
-                <img src="tokoh6.jpg" alt="Artikel Tambahan 6">
+                <img src="tokoh6.jpg" alt="Ahmad Yani">
                 <h3>Ahmad Yani</h3>
                 <a href="sampulAhmadYani.html">
-                <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
+                    <button>Baca Sekarang <img src="majesticons_arrow-right.png"></button>
                 </a>
             </div>
-            
         </div>
     </section>
     
-      <div class="container">
-    <div class="images">
-      <img src="bg1.png" alt="Foto 1" class="img1">
-      <img src="bg2.png" alt="Foto 2" class="img2">
-      <img src="bg3.png" alt="Foto 3" class="img3">
-      <img src="bg1.1.jpg" alt="Foto 4" class="img4">
+    <div class="container">
+        <div class="images">
+            <img src="bg1.png" alt="Foto 1" class="img1">
+            <img src="bg2.png" alt="Foto 2" class="img2">
+            <img src="bg3.png" alt="Foto 3" class="img3">
+            <img src="bg1.1.jpg" alt="Foto 4" class="img4">
+        </div>
+
+        <div class="text">
+            <h2>Mengapa Memilih Kami?</h2>
+            <ul>
+                <li>Penjelasan dibuat menarik dan mudah dipahami untuk semua usia</li>
+                <li>Gratis & mudah diakses, bisa dibuka kapan saja tanpa biaya</li>
+                <li>Membantu mengenal sejarah Indonesia secara mudah</li>
+                <li>Menyajikan informasi sejarah Indonesia yang terpercaya</li>
+                <li>Desain interaktif sehingga belajar sejarah terasa seru, bukan membosankan</li>
+            </ul>
+        </div>
     </div>
 
-    <div class="text">
-      <h2>Mengapa Memilih Kami?</h2>
-      <ul>
-        <li>Penjelasan dibuat menarik dan mudah dipahami untuk semua usia</li>
-        <li>Gratis & mudah diakses, bisa dibuka kapan saja tanpa biaya</li>
-        <li>Membantu mengenal sejarah Indonesia secara mudah</li>
-        <li>Menyajikan informasi sejarah Indonesia yang terpercaya</li>
-        <li>Desain interaktif sehingga belajar sejarah terasa seru, bukan membosankan</li>
-      </ul>
-    </div>
-  </div>
-<div class="footer">
+    <div class="footer">
         <div class="footer-container">
             
             <div class="footer-kolom logo-info">
@@ -968,12 +943,11 @@
             
             <div class="footer-kolom middle-section">
                 <div class="navigasi-horizontal">
-                    <a href="#">Beranda</a>
-                    <a href="#">Artikel</a>
-                    <a href="#">Favorit</a>
-                    <a href="#">Ulasan</a>
+                    <a href="landingpagepilihanfix.php">Beranda</a>
+                    <a href="daftarsearchSejarah.html">Artikel</a>
+                    <a href="favorit.php">Favorit</a>
+                    <a href="rating.php">Ulasan</a>
                 </div>
-
                 <div class="tentang-kita-container">
                     <h4>Tentang Kita</h4>
                     <p>Sejiwa.id adalah proyek kami untuk mengeksplorasi sejarah Indonesia dan berbagai cerita yang berharga dari masa lalu.</p>
@@ -997,80 +971,61 @@
     </div>
 
     <script>
-        // Fungsi untuk Dropdown Desktop (Artikel)
         function toggleDropdown(event) {
             event.preventDefault();
             const menu = document.getElementById('dropdown-menu');
-            // Menampilkan/menyembunyikan menu desktop
             menu.style.display = (menu.style.display === "flex") ? "none" : "flex";
         }
 
         document.addEventListener("click", function (e) {
             const menu = document.getElementById('dropdown-menu');
             const dropdown = document.querySelector(".dropdown");
-
-            // Menyembunyikan dropdown desktop jika klik di luar
             if (dropdown && !dropdown.contains(e.target)) {
                 menu.style.display = "none";
             }
         });
         
-        // --- Fungsi Sidebar Mobile ---
         const sidebar = document.getElementById('sidebar');
         const hamburgerBtn = document.getElementById('hamburger-btn');
         const closeSidebarBtn = document.getElementById('close-sidebar-btn');
-        const dropdownMenuSidebar = document.getElementById('dropdown-menu-sidebar');
 
-        // Membuka sidebar
         function openSidebar() {
-            // Mengambil lebar layar untuk menentukan lebar sidebar
             const screenWidth = window.innerWidth;
             let sidebarWidth = '250px';
-
-            // Jika layar sangat kecil, gunakan lebar penuh atau lebih besar
             if (screenWidth < 350) {
                 sidebarWidth = '90%';
             } else if (screenWidth < 450) {
                 sidebarWidth = '300px';
             }
-            
             sidebar.style.width = sidebarWidth;
-            document.body.style.overflow = 'hidden'; // Nonaktifkan scroll body
+            document.body.style.overflow = 'hidden';
         }
 
         hamburgerBtn.addEventListener('click', openSidebar);
-        
-        // Menutup sidebar
         closeSidebarBtn.addEventListener('click', closeSidebar);
 
         function closeSidebar() {
             sidebar.style.width = '0';
-            document.body.style.overflow = ''; // Aktifkan scroll body
-            // Pastikan dropdown di sidebar tertutup
+            document.body.style.overflow = '';
             const activeDropdown = document.querySelector('.dropdown-menu-sidebar[style*="display: block"]');
             if(activeDropdown) {
                 activeDropdown.style.display = 'none';
             }
         }
 
-        // Dropdown di dalam Sidebar
         function toggleDropdownSidebar(event) {
             event.preventDefault();
             const dropdown = event.target.nextElementSibling;
             if (dropdown.style.display === 'block') {
                 dropdown.style.display = 'none';
             } else {
-                
                 const allDropdowns = document.querySelectorAll('.dropdown-menu-sidebar');
                 allDropdowns.forEach(d => {
-                    if (d !== dropdown) {
-                        d.style.display = 'none';
-                    }
+                    if (d !== dropdown) d.style.display = 'none';
                 });
                 dropdown.style.display = 'block';
             }
         }
-
     </script>
 </body>
 </html>
