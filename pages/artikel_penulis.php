@@ -763,8 +763,8 @@ $page_param = isset($_GET['page']) ? $_GET['page'] : 'artikel_penulis';
                     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
                 </svg>
             </button>
-            <img src="/website/pages/logobenar.png" alt="Logo" class="logo-img">
-            <img src="/website/pages/sejput.png"    alt="Sejiwa" class="logo-text-img">
+            <img src="/website/logobenar.png" alt="Logo" class="logo-img">
+            <img src="/website/sejput.png"    alt="Sejiwa" class="logo-text-img">
         </div>
         <div class="admin-info">
             <span>👤 <strong><?= htmlspecialchars($_SESSION['nama_lengkap']) ?></strong>
