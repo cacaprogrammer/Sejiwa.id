@@ -978,9 +978,9 @@ $page_param = isset($_GET['page']) ? $_GET['page'] : 'artikel_penulis';
             <?php if ($cari !== '' || $filter_kat !== '' || $filter_st !== ''): ?>
             <div class="info-total-new">
                 <i class='bx bx-info-circle'></i> Menampilkan hasil pencarian untuk:
-                <?php if ($cari !== '')       echo " Kata kunci '<strong>".htmlspecialchars($cari)."</strong>';"; ?>
-                <?php if ($filter_kat !== '') echo " Kategori '<strong>".htmlspecialchars($filter_kat)."</strong>';"; ?>
-                <?php if ($filter_st !== '')  echo " Status '<strong>".htmlspecialchars($filter_st)."</strong>';"; ?>
+                <?php if ($cari !== '')       echo " Kata kunci '<strong>".phpspecialchars($cari)."</strong>';"; ?>
+                <?php if ($filter_kat !== '') echo " Kategori '<strong>".phpspecialchars($filter_kat)."</strong>';"; ?>
+                <?php if ($filter_st !== '')  echo " Status '<strong>".phpspecialchars($filter_st)."</strong>';"; ?>
             </div>
             <?php endif; ?>
 

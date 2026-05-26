@@ -137,21 +137,21 @@
         </div>
         <nav>
             <ul>
-                <li><a href="landingpagepilihanfix.html">Beranda</a></li>
+                <li><a href="landingpagepilihanfix.php">Beranda</a></li>
                 <li class="dropdown">
                     <a href="#" onclick="toggleDropdown(event)">Artikel ▾</a>
                     <div class="dropdown-menu" id="dropdown-menu">
-                        <div class="dropdown-inner"><a href="daftarsearchSejarah.html">Sejarah</a></div>
+                        <div class="dropdown-inner"><a href="daftarsearchSejarah.php">Sejarah</a></div>
                         <div class="dropdown-separator"></div>
-                        <div class="dropdown-inner"><a href="daftarsearchBiografi.html">Biografi Tokoh</a></div>
+                        <div class="dropdown-inner"><a href="daftarsearchBiografi.php">Biografi Tokoh</a></div>
                     </div>
                 </li>
-                <li><a href="favorit.html">Favorit</a></li>
-                <li><a href="rating.html">Ulasan</a></li>
+                <li><a href="favorit.php">Favorit</a></li>
+                <li><a href="rating.php">Ulasan</a></li>
             </ul>
         </nav>
         <div class="user-icon">
-            <a href="history.html"><i class="fas fa-user-circle"></i></a>
+            <a href="history.php"><i class="fas fa-user-circle"></i></a>
         </div>
     </header>
 
@@ -176,7 +176,7 @@
                     </button>
                 </div>
 
-                <!-- ✅ Tombol Rating — klik simpan artikel lalu buka rating.html -->
+                <!-- ✅ Tombol Rating — klik simpan artikel lalu buka rating.php -->
                 <button class="rating-box" onclick="bukaRating()">
                     <span>Rating &amp; Ulasan</span>
                     <img src="mdi_read-more-outline.png" alt="Ikon Rating" class="rating-icon">
@@ -205,13 +205,13 @@
             id: 'proklamasi-kemerdekaan',
             judul: 'Proklamasi Kemerdekaan',
             gambar: 'proklamasi.png',
-            link: 'isiArtikelproklamasi.html',
+            link: 'isiArtikelproklamasi.php',
             ratingKey: 'sejiwa_rating_proklamasi-kemerdekaan'
         };
 
         const FAVORIT_KEY  = 'sejiwa_favorit';
         const RATING_KEY   = 'sejiwa_rating_' + ARTIKEL_DATA.id;
-        const AKTIF_KEY    = 'sejiwa_aktif_artikel'; // kunci untuk memberi tahu rating.html
+        const AKTIF_KEY    = 'sejiwa_aktif_artikel'; // kunci untuk memberi tahu rating.php
 
         // ─── NAVBAR ───
         function toggleDropdown(event) {
@@ -284,7 +284,7 @@
         if (articleBody) articleBody.addEventListener('scroll', simpanProgress);
 
         // ─── FUNGSI UTAMA: Buka halaman Rating & Ulasan ───
-        // Menyimpan data artikel aktif ke localStorage lalu redirect ke rating.html
+        // Menyimpan data artikel aktif ke localStorage lalu redirect ke rating.php
         function bukaRating() {
             // Simpan info artikel yang sedang dibaca sebagai "artikel aktif"
             localStorage.setItem(AKTIF_KEY, JSON.stringify({
@@ -293,7 +293,7 @@
                 gambar: ARTIKEL_DATA.gambar,
                 link:   ARTIKEL_DATA.link
             }));
-            window.location.href = 'rating.html';
+            window.location.href = 'rating.php';
         }
 
         // Inisialisasi
