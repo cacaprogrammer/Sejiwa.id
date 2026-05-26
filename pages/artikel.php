@@ -1,6 +1,6 @@
 <?php
 // ============================================================
-// pages/artikel.php  —  Manajemen Artikel (CRUD lengkap)
+// pages/artikel.php  —  Manajemen Artikel (Clean & Standard)
 // ============================================================
 require_once __DIR__ . '/../koneksi.php';
 require_once __DIR__ . '/../cek_admin.php';
@@ -46,7 +46,6 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah') {
     $kategori = $_POST['kategori'];
     $status   = $_POST['status'];
     
-    // OTOMATISASI: Jika role penulis, kunci nama berdasarkan session login. Jika admin, bisa input manual.
     if ($_SESSION['role'] === 'penulis') {
         $penulis = $_SESSION['nama_lengkap'];
     } else {
@@ -73,8 +72,6 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah') {
 
     if ($tipe !== 'error') {
         $stmt = $conn->prepare("INSERT INTO tb_artikel (judul, slug, konten, preview, penulis, thumbnail, kategori, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
-        
-        // OTOMATISASI: created_by mengambil ID user yang sedang aktif dari session
         $user_id = $_SESSION['id'] ?? 1;
         
         $stmt->bind_param("ssssssssi", $judul, $slug, $konten, $preview, $penulis, $thumbnail, $kategori, $status, $user_id);
@@ -92,7 +89,6 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'edit') {
     $kategori = $_POST['kategori'];
     $status   = $_POST['status'];
     
-    // OTOMATISASI: Jika role penulis, nama penulis saat edit dikunci menggunakan data session.
     if ($_SESSION['role'] === 'penulis') {
         $penulis = $_SESSION['nama_lengkap'];
     } else {
@@ -204,7 +200,7 @@ function buildUrl($extra = []) {
 
 <style>
 :root {
-    --sj-dark:    #4A2C18;
+    --sj-dark:     #4A2C18;
     --sj-darker:  #4D1E0A;
     --sj-mid:     #7B4F2C;
     --sj-gold:    #D99B3E;
@@ -214,9 +210,7 @@ function buildUrl($extra = []) {
     --brown-800: #4D1E0A;
     --brown-700: #4A2C18;
     --brown-600: #7B4F2C;
-    --brown-500: #9a6540;
     --brown-400: #AD8D77;
-    --brown-300: #c8ab93;
     --brown-200: #dfc8b0;
     --brown-100: #f0e4d2;
     --brown-50:  #faf5ec;
@@ -238,13 +232,11 @@ function buildUrl($extra = []) {
     --radius-lg:  14px;
     --radius-xl:  18px;
     --transition:      all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    --transition-slow: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     --font-heading: 'Montserrat', sans-serif;
     --font-body:    'Roboto', sans-serif;
     --green-bg:   #ecfdf5; --green-text: #065f46; --green-border: #a7f3d0;
     --yellow-bg:  #fef9ee; --yellow-text: #7a4a00; --yellow-border: #f5d07a;
     --blue-bg:    #eff6ff; --blue-text:   #1d4ed8; --blue-border:  #bfdbfe;
-    --purple-bg:  #f5f3ff; --purple-text: #5b21b6; --purple-border: #ddd6fe;
     --red-bg:     #fff1f2; --red-text:    #be123c;  --red-border:   #fda4af;
 }
 
@@ -570,9 +562,8 @@ function buildUrl($extra = []) {
 }
 </style>
 
-<div class="artikel-page">
 
-<!-- NOTIFIKASI -->
+
 <?php if ($pesan): ?>
 <div class="notif-modern <?= $tipe ?>" id="notif-box">
     <div class="notif-icon">
@@ -589,7 +580,6 @@ function buildUrl($extra = []) {
 </div>
 <?php endif; ?>
 
-<!-- PAGE HEADER (mode list) -->
 <?php if (!$mode_edit && !isset($_GET['tambah'])): ?>
 <div class="page-header">
     <div class="page-header-left">
@@ -601,14 +591,13 @@ function buildUrl($extra = []) {
             <span style="color:var(--brown-600);font-weight:600;">Artikel</span>
         </div>
     </div>
-    <a href="?page=artikel&tambah=1" class="btn-tambah-new">
+    <a href="?tambah=1" class="btn-tambah-new">
         <i class='bx bx-plus'></i>
         Tambah Artikel Baru
     </a>
 </div>
 <?php endif; ?>
 
-<!-- FORM TAMBAH / EDIT -->
 <?php if (isset($_GET['tambah']) || $mode_edit): ?>
 
 <div class="page-header">
@@ -650,7 +639,11 @@ function buildUrl($extra = []) {
                 <div class="form-group">
                     <label>Penulis</label>
                     <input type="text" name="penulis" placeholder="Nama penulis..."
-                        value="<?= htmlspecialchars($data_edit['penulis'] ?? 'Admin') ?>">
+                        value="<?= htmlspecialchars($data_edit['penulis'] ?? $_SESSION['nama_lengkap']) ?>"
+                        <?= ($_SESSION['role'] === 'penulis') ? 'readonly style="background-color: #f0eae1; cursor: not-allowed;"' : '' ?>>
+                    <?php if ($_SESSION['role'] === 'penulis'): ?>
+                        <div class="form-hint" style="color: var(--sj-mid);">Nama penulis dikunci sesuai dengan akun login Anda.</div>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -700,7 +693,7 @@ function buildUrl($extra = []) {
                     <label>Isi Artikel Lengkap <span class="required">*</span></label>
                     <div class="form-hint" style="margin-bottom:6px;">Gunakan tag &lt;p&gt; untuk setiap paragraf.</div>
                     <textarea name="konten" id="konten-textarea" required
-                        placeholder="<p>Paragraf pertama...</p>&#10;<p>Paragraf kedua...</p>"><?= htmlspecialchars($data_edit['konten'] ?? '') ?></textarea>
+                        placeholder="&lt;p&gt;Paragraf pertama...&lt;/p&gt;&#10;&lt;p&gt;Paragraf kedua...&lt;/p&gt;"><?= htmlspecialchars($data_edit['konten'] ?? '') ?></textarea>
                 </div>
             </div>
 
@@ -709,177 +702,125 @@ function buildUrl($extra = []) {
                     <i class='bx <?= $mode_edit ? "bx-save" : "bx-check" ?>'></i>
                     <?= $mode_edit ? 'Simpan Perubahan' : 'Tambah Artikel' ?>
                 </button>
-                <a href="dashboardAdmin.php?page=artikel" class="btn-batal-new">
-                    <i class='bx bx-arrow-back'></i>
-                    Batal
-                </a>
+                <a href="?page=artikel" class="btn-batal-new">Batal</a>
             </div>
         </form>
     </div>
 </div>
 
-<?php else: ?>
+<?php endif; ?>
 
-<!-- TABEL ARTIKEL -->
+<?php if (!$mode_edit && !isset($_GET['tambah'])): ?>
 <div class="tabel-card-new">
-
     <div class="tabel-card-header">
         <div class="tabel-card-header-top">
             <div class="tabel-card-title">
-                <div class="title-icon"><i class='bx bx-news'></i></div>
-                Daftar Artikel
-                <span class="count-badge"><?= $total_data ?> artikel</span>
+                <div class="title-icon"><i class='bx bx-list-ul'></i></div>
+                Daftar Artikel 
+                <span class="count-badge"><?= $total_data ?> Data</span>
             </div>
         </div>
 
-        <form method="get" action="" id="filter-form">
+        <form method="get" action="">
             <input type="hidden" name="page" value="artikel">
             <div class="toolbar-new">
                 <div class="search-wrapper">
                     <i class='bx bx-search'></i>
-                    <input type="text" name="cari" class="search-input-new"
-                           placeholder="Cari judul atau penulis..."
-                           value="<?= htmlspecialchars($cari) ?>">
+                    <input type="text" name="cari" class="search-input-new" placeholder="Cari judul atau penulis..." value="<?= htmlspecialchars($cari) ?>">
                 </div>
-
-                <select name="kategori" class="select-filter" onchange="document.getElementById('filter-form').submit()">
-                    <option value="">Semua Kategori</option>
-                    <option value="sejarah"  <?= $filter_kat === 'sejarah'  ? 'selected' : '' ?>>Sejarah</option>
-                    <option value="biografi" <?= $filter_kat === 'biografi' ? 'selected' : '' ?>>Biografi</option>
+                <select name="kategori" class="select-filter" onchange="this.form.submit()">
+                    <option value="">— Semua Kategori —</option>
+                    <option value="sejarah" <?= $filter_kat === 'sejarah' ? 'selected' : '' ?>>Sejarah</option>
+                    <option value="biografi" <?= $filter_kat === 'biografi' ? 'selected' : '' ?>>Biografi Tokoh</option>
                 </select>
-
-                <select name="status" class="select-filter" onchange="document.getElementById('filter-form').submit()">
-                    <option value="">Semua Status</option>
+                <select name="status" class="select-filter" onchange="this.form.submit()">
+                    <option value="">— Semua Status —</option>
                     <option value="published" <?= $filter_st === 'published' ? 'selected' : '' ?>>Published</option>
-                    <option value="draft"     <?= $filter_st === 'draft'     ? 'selected' : '' ?>>Draft</option>
+                    <option value="draft" <?= $filter_st === 'draft' ? 'selected' : '' ?>>Draft</option>
                 </select>
-
-                <button type="button" class="btn-refresh" id="btn-refresh" onclick="handleRefresh()">
-                    <i class='bx bx-refresh' id="refresh-icon"></i>
-                    Refresh
-                </button>
-
-                <button type="submit" style="display:none;"></button>
+                <button type="submit" style="display:none;">Cari</button>
+                <a href="?page=artikel" class="btn-refresh" id="btn-refresh-anim">
+                    <i class='bx bx-refresh'></i> Reset Filter
+                </a>
             </div>
         </form>
     </div>
 
+    <?php if ($cari !== '' || $filter_kat !== '' || $filter_st !== ''): ?>
     <div class="info-total-new">
-        <i class='bx bx-info-circle' style="font-size:14px;"></i>
-        Menampilkan <strong><?= count($artikel_list) ?></strong> dari <strong><?= $total_data ?></strong> artikel
-        <?php if ($cari): ?>
-            &nbsp;·&nbsp; Pencarian: <strong>"<?= htmlspecialchars($cari) ?>"</strong>
-        <?php endif; ?>
-        <?php if ($filter_kat): ?>
-            &nbsp;·&nbsp; Kategori: <strong><?= ucfirst($filter_kat) ?></strong>
-        <?php endif; ?>
-        <?php if ($filter_st): ?>
-            &nbsp;·&nbsp; Status: <strong><?= ucfirst($filter_st) ?></strong>
-        <?php endif; ?>
+        <i class='bx bx-info-circle'></i> Menampilkan hasil pencarian untuk: 
+        <?php if($cari!=='') echo " Kata kunci '<strong>".htmlspecialchars($cari)."</strong>';"; ?>
+        <?php if($filter_kat!=='') echo " Kategori '<strong>".htmlspecialchars($filter_kat)."</strong>';"; ?>
+        <?php if($filter_st!=='') echo " Status '<strong>".htmlspecialchars($filter_st)."</strong>';"; ?>
     </div>
+    <?php endif; ?>
 
     <div class="table-scroll">
         <table class="artikel-table-new">
             <thead>
                 <tr>
-                    <th style="width:44px;">No</th>
-                    <th style="width:60px;">Cover</th>
-                    <th>
-                        <a href="<?= buildUrl(['sort'=>'judul','dir'=>$sort_by==='judul'?$sort_next:'ASC','halaman'=>1]) ?>">
-                            Judul <i class='bx <?= $sort_by==="judul" ? ($sort_dir==="ASC"?"bx-up-arrow-alt":"bx-down-arrow-alt") : "bx-sort-alt-2" ?> sort-icon'></i>
-                        </a>
-                    </th>
-                    <th>
-                        <a href="<?= buildUrl(['sort'=>'kategori','dir'=>$sort_by==='kategori'?$sort_next:'ASC','halaman'=>1]) ?>">
-                            Kategori <i class='bx <?= $sort_by==="kategori" ? ($sort_dir==="ASC"?"bx-up-arrow-alt":"bx-down-arrow-alt") : "bx-sort-alt-2" ?> sort-icon'></i>
-                        </a>
-                    </th>
-                    <th>
-                        <a href="<?= buildUrl(['sort'=>'penulis','dir'=>$sort_by==='penulis'?$sort_next:'ASC','halaman'=>1]) ?>">
-                            Penulis <i class='bx <?= $sort_by==="penulis" ? ($sort_dir==="ASC"?"bx-up-arrow-alt":"bx-down-arrow-alt") : "bx-sort-alt-2" ?> sort-icon'></i>
-                        </a>
-                    </th>
-                    <th>
-                        <a href="<?= buildUrl(['sort'=>'status','dir'=>$sort_by==='status'?$sort_next:'ASC','halaman'=>1]) ?>">
-                            Status <i class='bx <?= $sort_by==="status" ? ($sort_dir==="ASC"?"bx-up-arrow-alt":"bx-down-arrow-alt") : "bx-sort-alt-2" ?> sort-icon'></i>
-                        </a>
-                    </th>
-                    <th>
-                        <a href="<?= buildUrl(['sort'=>'view_count','dir'=>$sort_by==='view_count'?$sort_next:'DESC','halaman'=>1]) ?>">
-                            Views <i class='bx <?= $sort_by==="view_count" ? ($sort_dir==="ASC"?"bx-up-arrow-alt":"bx-down-arrow-alt") : "bx-sort-alt-2" ?> sort-icon'></i>
-                        </a>
-                    </th>
-                    <th>
-                        <a href="<?= buildUrl(['sort'=>'created_at','dir'=>$sort_by==='created_at'?$sort_next:'DESC','halaman'=>1]) ?>">
-                            Tanggal <i class='bx <?= $sort_by==="created_at" ? ($sort_dir==="ASC"?"bx-up-arrow-alt":"bx-down-arrow-alt") : "bx-sort-alt-2" ?> sort-icon'></i>
-                        </a>
-                    </th>
-                    <th style="text-align:right; padding-right:20px;">Aksi</th>
+                    <th style="width:50px; text-align:center;">No</th>
+                    <th style="width:70px;">Cover</th>
+                    <th><a href="<?= buildUrl(['sort'=>'judul','dir'=>$sort_next]) ?>">Judul Artikel <?php if($sort_by==='judul') echo $sort_dir==='ASC'?"<i class='bx bx-chevron-up sort-icon'></i>":"<i class='bx bx-chevron-down sort-icon'></i>"; ?></a></th>
+                    <th><a href="<?= buildUrl(['sort'=>'kategori','dir'=>$sort_next]) ?>">Kategori <?php if($sort_by==='kategori') echo $sort_dir==='ASC'?"<i class='bx bx-chevron-up sort-icon'></i>":"<i class='bx bx-chevron-down sort-icon'></i>"; ?></a></th>
+                    <th><a href="<?= buildUrl(['sort'=>'penulis','dir'=>$sort_next]) ?>">Penulis <?php if($sort_by==='penulis') echo $sort_dir==='ASC'?"<i class='bx bx-chevron-up sort-icon'></i>":"<i class='bx bx-chevron-down sort-icon'></i>"; ?></a></th>
+                    <th><a href="<?= buildUrl(['sort'=>'created_at','dir'=>$sort_next]) ?>">Tanggal <?php if($sort_by==='created_at') echo $sort_dir==='ASC'?"<i class='bx bx-chevron-up sort-icon'></i>":"<i class='bx bx-chevron-down sort-icon'></i>"; ?></a></th>
+                    <th><a href="<?= buildUrl(['sort'=>'status','dir'=>$sort_next]) ?>">Status <?php if($sort_by==='status') echo $sort_dir==='ASC'?"<i class='bx bx-chevron-up sort-icon'></i>":"<i class='bx bx-chevron-down sort-icon'></i>"; ?></a></th>
+                    <th style="width:140px; text-align:right; padding-right:24px;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-            <?php if (empty($artikel_list)): ?>
+                <?php if (empty($artikel_list)): ?>
                 <tr>
-                    <td colspan="9">
+                    <td colspan="8">
                         <div class="no-data-new">
-                            <i class='bx bx-news no-data-icon'></i>
-                            <p>Tidak ada artikel ditemukan</p>
-                            <small><?= $cari ? 'Coba ubah kata kunci pencarian Anda.' : 'Mulai dengan menambahkan artikel baru.' ?></small>
+                            <i class='bx bx-folder-open no-data-icon'></i>
+                            <p>Tidak ada artikel yang ditemukan</p>
+                            <small>Silakan tambah artikel baru atau ubah kata kunci pencarian Anda.</small>
                         </div>
                     </td>
                 </tr>
-            <?php else: ?>
-                <?php foreach ($artikel_list as $i => $a): ?>
+                <?php else: ?>
+                <?php $no = $offset + 1; foreach ($artikel_list as $art): ?>
                 <tr>
-                    <td><span class="row-num"><?= ($halaman-1)*$per_halaman+$i+1 ?></span></td>
+                    <td class="row-num" style="text-align:center;"><?= $no++ ?></td>
                     <td>
                         <div class="thumb-wrap">
-                            <?php if (!empty($a['thumbnail'])): ?>
-                            <img src="<?= htmlspecialchars(getImgSrc($a['thumbnail'])) ?>" alt=""
-                                 onerror="this.parentNode.innerHTML='<i class=\'bx bx-image-alt thumb-placeholder\'></i>'">
+                            <?php if (!empty($art['thumbnail'])): ?>
+                                <img src="<?= htmlspecialchars(getImgSrc($art['thumbnail'])) ?>" alt="Cover">
                             <?php else: ?>
-                            <i class='bx bx-image-alt thumb-placeholder'></i>
+                                <i class='bx bx-image thumb-placeholder'></i>
                             <?php endif; ?>
                         </div>
                     </td>
                     <td>
-                        <div class="judul-cell" title="<?= htmlspecialchars($a['judul']) ?>">
-                            <?= htmlspecialchars($a['judul']) ?>
-                        </div>
+                        <div class="judul-cell" title="<?= htmlspecialchars($art['judul']) ?>"><?= htmlspecialchars($art['judul']) ?></div>
                     </td>
                     <td>
-                        <?php if ($a['kategori'] === 'sejarah'): ?>
-                            <span class="badge-new kat-sejarah"><i class='bx bx-time-five'></i> Sejarah</span>
+                        <?php if ($art['kategori'] === 'sejarah'): ?>
+                            <span class="badge-new kat-sejarah"><i class='bx bx-history'></i> Sejarah</span>
                         <?php else: ?>
                             <span class="badge-new kat-biografi"><i class='bx bx-user'></i> Biografi</span>
                         <?php endif; ?>
                     </td>
-                    <td><span class="cell-muted"><?= htmlspecialchars($a['penulis'] ?? '—') ?></span></td>
+                    <td class="cell-muted"><?= htmlspecialchars($art['penulis']) ?></td>
+                    <td class="cell-date"><?= date('d M Y', strtotime($art['created_at'])) ?></td>
                     <td>
-                        <?php if ($a['status'] === 'published'): ?>
+                        <?php if ($art['status'] === 'published'): ?>
                             <span class="badge-new status-published"><i class='bx bx-check-circle'></i> Published</span>
                         <?php else: ?>
-                            <span class="badge-new status-draft"><i class='bx bx-pencil'></i> Draft</span>
+                            <span class="badge-new status-draft"><i class='bx bx-edit-alt'></i> Draft</span>
                         <?php endif; ?>
                     </td>
-                    <td><span class="cell-views"><?= number_format($a['view_count']) ?></span></td>
-                    <td><span class="cell-date"><?= date('d M Y', strtotime($a['created_at'])) ?></span></td>
-                    <td>
+                    <td style="padding-right:24px;">
                         <div class="aksi-group">
-                            <a href="?page=artikel&edit=<?= $a['id'] ?>"
-                               class="aksi-btn-new btn-edit-new">
-                                <i class='bx bx-edit'></i> Edit
-                            </a>
-                            <a href="?page=artikel&hapus=<?= $a['id'] ?>"
-                               onclick="return confirmHapus('<?= htmlspecialchars(addslashes($a['judul'])) ?>')"
-                               class="aksi-btn-new btn-hapus-new">
-                                <i class='bx bx-trash'></i> Hapus
-                            </a>
+                            <a href="?page=artikel&edit=<?= $art['id'] ?>" class="aksi-btn-new btn-edit-new" title="Edit"><i class='bx bx-edit'></i> Edit</a>
+                            <a href="?page=artikel&hapus=<?= $art['id'] ?>" class="aksi-btn-new btn-hapus-new" title="Hapus" onclick="return confirm('Yakin ingin menghapus artikel ini?')"><i class='bx bx-trash'></i> Hapus</a>
                         </div>
                     </td>
                 </tr>
                 <?php endforeach; ?>
-            <?php endif; ?>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -887,76 +828,62 @@ function buildUrl($extra = []) {
     <?php if ($total_page > 1): ?>
     <div class="pagination-new">
         <?php if ($halaman > 1): ?>
-            <a href="<?= buildUrl(['halaman'=>$halaman-1]) ?>" class="page-btn"><i class='bx bx-chevron-left'></i></a>
+            <a href="<?= buildUrl(['halaman' => $halaman - 1]) ?>" class="page-btn"><i class='bx bx-chevron-left'></i></a>
         <?php else: ?>
             <span class="page-btn nonaktif"><i class='bx bx-chevron-left'></i></span>
         <?php endif; ?>
 
-        <?php for ($i = 1; $i <= $total_page; $i++): ?>
-            <?php if ($i === $halaman): ?>
-                <span class="page-btn aktif"><?= $i ?></span>
-            <?php elseif ($i === 1 || $i === $total_page || abs($i - $halaman) <= 2): ?>
-                <a href="<?= buildUrl(['halaman'=>$i]) ?>" class="page-btn"><?= $i ?></a>
-            <?php elseif (abs($i - $halaman) === 3): ?>
-                <span class="page-ellipsis">…</span>
-            <?php endif; ?>
-        <?php endfor; ?>
+        <?php 
+        $start_page = max(1, $halaman - 2);
+        $end_page   = min($total_page, $halaman + 2);
+        
+        if ($start_page > 1) {
+            echo '<a href="'.buildUrl(['halaman' => 1]).'" class="page-btn">1</a>';
+            if ($start_page > 2) echo '<span class="page-ellipsis">...</span>';
+        }
+        
+        for ($i = $start_page; $i <= $end_page; $i++) {
+            $aktif = ($i === $halaman) ? 'aktif' : '';
+            echo '<a href="'.buildUrl(['halaman' => $i]).'" class="page-btn '.$aktif.'">'.$i.'</a>';
+        }
+        
+        if ($end_page < $total_page) {
+            if ($end_page < $total_page - 1) echo '<span class="page-ellipsis">...</span>';
+            echo '<a href="'.buildUrl(['halaman' => $total_page]).'" class="page-btn">'+$total_page+'</a>';
+        }
+        ?>
 
         <?php if ($halaman < $total_page): ?>
-            <a href="<?= buildUrl(['halaman'=>$halaman+1]) ?>" class="page-btn"><i class='bx bx-chevron-right'></i></a>
+            <a href="<?= buildUrl(['halaman' => $halaman + 1]) ?>" class="page-btn"><i class='bx bx-chevron-right'></i></a>
         <?php else: ?>
-            <span class="page-btn nonaktif"><i class='bx bx-chevron-right'></i></span>
+            <span class="page-btn nonaktif"><i class='bx bx-chevron-left'></i></span>
         <?php endif; ?>
 
-        <span class="page-info">Halaman <?= $halaman ?> dari <?= $total_page ?></span>
+        <div class="page-info">
+            Halaman <strong><?= $halaman ?></strong> dari <strong><?= $total_page ?></strong> (Total <strong><?= $total_data ?></strong> Artikel)
+        </div>
     </div>
     <?php endif; ?>
-
-</div><!-- end tabel-card-new -->
-
+</div>
 <?php endif; ?>
 
-</div><!-- end artikel-page -->
+</div>
 
 <script>
 function previewGambar(input) {
-    const img = document.getElementById('preview-img');
+    const preview = document.getElementById('preview-img');
     if (input.files && input.files[0]) {
         const reader = new FileReader();
-        reader.onload = e => {
-            img.src = e.target.result;
-            img.style.display = 'block';
-        };
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        }
         reader.readAsDataURL(input.files[0]);
     }
 }
 
-function confirmHapus(judul) {
-    return confirm('Hapus artikel "' + judul + '"?\n\nArtikel yang dihapus tidak dapat dikembalikan.');
-}
-
-function handleRefresh() {
-    const icon = document.getElementById('refresh-icon');
-    icon.classList.add('spinning');
-    setTimeout(() => { window.location.reload(); }, 300);
-}
-
-const notif = document.getElementById('notif-box');
-if (notif) {
-    setTimeout(() => {
-        notif.style.transition = 'opacity 0.4s ease';
-        notif.style.opacity = '0';
-        setTimeout(() => notif.style.display = 'none', 400);
-    }, 5000);
-}
-
-const searchInput = document.querySelector('.search-input-new');
-if (searchInput) {
-    searchInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            document.getElementById('filter-form').submit();
-        }
-    });
-}
+// Efek animasi berputar halus pada tombol reset filter ketika diklik
+document.getElementById('btn-refresh-anim')?.addEventListener('click', function() {
+    this.querySelector('.bx').classList.add('spinning');
+});
 </script>

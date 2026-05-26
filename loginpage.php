@@ -1,12 +1,12 @@
 <?php
 session_start();
 
-// 1. Jika user sudah login, langsung redirect otomatis sesuai folder 'pages'
+// 1. Jika user sudah login, langsung redirect otomatis sesuai role
 if (isset($_SESSION['username'])) {
     if ($_SESSION['role'] === 'admin') {
         header("Location: dashboardAdmin.php");
     } elseif ($_SESSION['role'] === 'penulis') {
-        header("Location: pages/artikel.php"); // DIPERBAIKI: Mengarah ke folder pages dan file artikel.php
+        header("Location: pages/artikel_penulis.php"); // PERBAIKAN: Mengarah ke file artikel_penulis.php
     } else {
         header("Location: landingpagepilihanfix.php");
     }
@@ -41,7 +41,7 @@ if (isset($_POST['submit'])) {
             if ($user['role'] === 'admin') {
                 header("Location: dashboardAdmin.php");
             } elseif ($user['role'] === 'penulis') {
-                header("Location: pages/artikel.php"); // DIPERBAIKI: Mengarah ke folder pages dan file artikel.php
+                header("Location: pages/artikel_penulis.php"); // PERBAIKAN: Mengarah ke file artikel_penulis.php
             } else {
                 header("Location: landingpagepilihanfix.php");
             }
@@ -226,7 +226,7 @@ if (isset($_POST['submit'])) {
 
     .options a:hover { text-decoration: underline; }
 
-    /* Tombol submit yang sesungguhnya */
+    /* Tombol submit */
     .btn-masuk {
       width: 100%;
       padding: 13px;
@@ -326,10 +326,8 @@ if (isset($_POST['submit'])) {
 
 <div class="container">
 
-  <!-- PANEL KIRI (tidak diubah) -->
   <div class="left"></div>
 
-  <!-- PANEL KANAN -->
   <div class="right">
 
     <div class="welcome">
@@ -338,7 +336,6 @@ if (isset($_POST['submit'])) {
     </div>
     <p class="subtitle">Masuk ke akun kamu untuk mulai menjelajah</p>
 
-    <!-- Tampilkan pesan error jika ada -->
     <?php if ($pesan != ""): ?>
       <div class="pesan-error">
         <i class="fa-solid fa-circle-exclamation"></i>
@@ -346,7 +343,6 @@ if (isset($_POST['submit'])) {
       </div>
     <?php endif; ?>
 
-    <!-- Form dengan method POST agar PHP bisa membaca inputnya -->
     <form method="post" action="">
 
       <div class="field">
@@ -372,7 +368,6 @@ if (isset($_POST['submit'])) {
         <a href="#">Lupa kata sandi?</a>
       </div>
 
-      <!-- Tombol submit yang benar, bukan <a href> -->
       <button type="submit" name="submit" class="btn-masuk">Masuk</button>
 
       <div class="divider">atau masuk dengan</div>
