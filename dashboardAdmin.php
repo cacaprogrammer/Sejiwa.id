@@ -4,7 +4,7 @@ include "cek_admin.php";
 include "koneksi.php";
 
 // Whitelist halaman yang boleh dipanggil (keamanan dari LFI)
-$allowed = ['dashboard', 'artikel', 'user'];
+$allowed = ['dashboard', 'artikel', 'user', 'kategori'];
 
 // Ambil parameter ?page= dari URL, default: dashboard
 $page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
@@ -180,6 +180,15 @@ if (!in_array($page, $allowed)) {
                         <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-1 16H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1zM7 9h2v2H7zm4 0h6v2h-6zm-4 4h2v2H7zm4 0h6v2h-6z"/>
                     </svg>
                     Manajemen Artikel
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="dashboardAdmin.php?page=kategori"
+                   class="<?= $page === 'kategori' ? 'active' : '' ?>">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M12 2l-5.5 9h11zm0 3.84L14.6 10h-5.2zM17.5 13c-2.49 0-4.5 2.01-4.5 4.5S15.01 22 17.5 22s4.5-2.01 4.5-4.5S19.99 13 17.5 13zm0 7c-1.38 0-2.5-1.12-2.5-2.5S16.12 15 17.5 15s2.5 1.12 2.5 2.5S18.88 20 17.5 20zM3 21.5h8v-8H3v8zm2-6h4v4H5v-4z"/>
+                    </svg>
+                    Manajemen Kategori
                 </a>
             </li>
             <li class="nav-item">

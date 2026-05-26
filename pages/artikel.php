@@ -8,6 +8,11 @@ require_once __DIR__ . '/../cek_admin.php';
 $pesan = '';
 $tipe  = '';
 
+// ═══════════════════════════════════════════════════════════
+//  AMBIL DAFTAR KATEGORI DARI DATABASE (dinamis)
+// ═══════════════════════════════════════════════════════════
+$daftar_kategori = $conn->query("SELECT id_kategori, nama_kategori, slug_kategori FROM tb_kategori ORDER BY nama_kategori ASC")->fetch_all(MYSQLI_ASSOC);
+
 function buatSlug($judul) {
     $slug = strtolower(trim($judul));
     $slug = preg_replace('/[^a-z0-9\s-]/', '', $slug);
@@ -42,10 +47,17 @@ function getImgSrc($thumb) {
 //  PROSES TAMBAH ARTIKEL
 // ═══════════════════════════════════════════════════════════
 if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah') {
-    $judul    = trim($_POST['judul']);
-    $kategori = $_POST['kategori'];
-    $status   = $_POST['status'];
+    $judul       = trim($_POST['judul']);
+    $id_kategori = (int)$_POST['id_kategori'];
+    $status      = $_POST['status'];
     
+    // Ambil slug kategori berdasarkan id_kategori
+    $q_kat = $conn->prepare("SELECT slug_kategori FROM tb_kategori WHERE id_kategori = ?");
+    $q_kat->bind_param("i", $id_kategori);
+    $q_kat->execute();
+    $row_kat  = $q_kat->get_result()->fetch_assoc();
+    $kategori = $row_kat ? $row_kat['slug_kategori'] : '';
+
     if ($_SESSION['role'] === 'penulis') {
         $penulis = $_SESSION['nama_lengkap'];
     } else {
@@ -71,10 +83,10 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah') {
     }
 
     if ($tipe !== 'error') {
-        $stmt = $conn->prepare("INSERT INTO tb_artikel (judul, slug, konten, preview, penulis, thumbnail, kategori, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+        $stmt = $conn->prepare("INSERT INTO tb_artikel (judul, slug, konten, preview, penulis, thumbnail, kategori, id_kategori, status, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
         $user_id = $_SESSION['id'] ?? 1;
         
-        $stmt->bind_param("ssssssssi", $judul, $slug, $konten, $preview, $penulis, $thumbnail, $kategori, $status, $user_id);
+        $stmt->bind_param("sssssssisi", $judul, $slug, $konten, $preview, $penulis, $thumbnail, $kategori, $id_kategori, $status, $user_id);
         if ($stmt->execute()) { $pesan = 'Artikel berhasil ditambahkan!'; $tipe = 'sukses'; }
         else { $pesan = 'Gagal: ' . $stmt->error; $tipe = 'error'; }
     }
@@ -84,11 +96,18 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah') {
 //  PROSES EDIT ARTIKEL
 // ═══════════════════════════════════════════════════════════
 if (isset($_POST['aksi']) && $_POST['aksi'] === 'edit') {
-    $id       = (int)$_POST['id'];
-    $judul    = trim($_POST['judul']);
-    $kategori = $_POST['kategori'];
-    $status   = $_POST['status'];
-    
+    $id          = (int)$_POST['id'];
+    $judul       = trim($_POST['judul']);
+    $id_kategori = (int)$_POST['id_kategori'];
+    $status      = $_POST['status'];
+
+    // Ambil slug kategori berdasarkan id_kategori
+    $q_kat = $conn->prepare("SELECT slug_kategori FROM tb_kategori WHERE id_kategori = ?");
+    $q_kat->bind_param("i", $id_kategori);
+    $q_kat->execute();
+    $row_kat  = $q_kat->get_result()->fetch_assoc();
+    $kategori = $row_kat ? $row_kat['slug_kategori'] : '';
+
     if ($_SESSION['role'] === 'penulis') {
         $penulis = $_SESSION['nama_lengkap'];
     } else {
@@ -108,8 +127,8 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'edit') {
     }
 
     if ($tipe !== 'error') {
-        $stmt = $conn->prepare("UPDATE tb_artikel SET judul=?, konten=?, preview=?, penulis=?, thumbnail=?, kategori=?, status=? WHERE id=?");
-        $stmt->bind_param("sssssssi", $judul, $konten, $preview, $penulis, $thumbnail, $kategori, $status, $id);
+        $stmt = $conn->prepare("UPDATE tb_artikel SET judul=?, konten=?, preview=?, penulis=?, thumbnail=?, kategori=?, id_kategori=?, status=? WHERE id=?");
+        $stmt->bind_param("sssssssii", $judul, $konten, $preview, $penulis, $thumbnail, $kategori, $id_kategori, $status, $id);
         if ($stmt->execute()) { $pesan = 'Artikel berhasil diperbarui!'; $tipe = 'sukses'; }
         else { $pesan = 'Gagal: ' . $stmt->error; $tipe = 'error'; }
     }
@@ -171,14 +190,14 @@ if ($cari !== '') {
 if ($filter_kat !== '') { $where .= " AND kategori = ?"; $params[] = $filter_kat; $types .= "s"; }
 if ($filter_st  !== '') { $where .= " AND status = ?";   $params[] = $filter_st;  $types .= "s"; }
 
-$q_total = $conn->prepare("SELECT COUNT(*) as total FROM tb_artikel $where");
+$q_total = $conn->prepare("SELECT COUNT(*) as total FROM tb_artikel a LEFT JOIN tb_kategori k ON k.id_kategori = a.id_kategori $where");
 if ($params) $q_total->bind_param($types, ...$params);
 $q_total->execute();
 $total_data  = $q_total->get_result()->fetch_assoc()['total'];
 $total_page  = ceil($total_data / $per_halaman);
 $offset      = ($halaman - 1) * $per_halaman;
 
-$q_data        = $conn->prepare("SELECT * FROM tb_artikel $where ORDER BY $sort_by $sort_dir LIMIT ? OFFSET ?");
+$q_data        = $conn->prepare("SELECT a.*, k.nama_kategori, k.slug_kategori FROM tb_artikel a LEFT JOIN tb_kategori k ON k.id_kategori = a.id_kategori $where ORDER BY $sort_by $sort_dir LIMIT ? OFFSET ?");
 $params_data   = $params;
 $params_data[] = $per_halaman;
 $params_data[] = $offset;
@@ -492,6 +511,10 @@ function buildUrl($extra = []) {
 .badge-new.status-draft     { background: var(--yellow-bg); color: var(--yellow-text); border: 1px solid var(--yellow-border); }
 .badge-new.kat-sejarah  { background: #fef3d6; color: #7a4a00; border: 1px solid #f5d07a; }
 .badge-new.kat-biografi { background: var(--brown-100); color: var(--sj-dark); border: 1px solid var(--brown-200); }
+/* Badge generik untuk kategori dinamis baru */
+.badge-new[class*="kat-"] { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.badge-new.kat-sejarah  { background: #fef3d6; color: #7a4a00; border: 1px solid #f5d07a; }
+.badge-new.kat-biografi { background: var(--brown-100); color: var(--sj-dark); border: 1px solid var(--brown-200); }
 
 .row-num { font-size: 12px; color: var(--text-disabled); font-weight: 500; font-variant-numeric: tabular-nums; }
 .cell-muted  { color: var(--text-muted); font-size: 13.5px; }
@@ -650,10 +673,14 @@ function buildUrl($extra = []) {
             <div class="form-grid-2">
                 <div class="form-group">
                     <label>Kategori <span class="required">*</span></label>
-                    <select name="kategori" required>
+                    <select name="id_kategori" required>
                         <option value="">— Pilih Kategori —</option>
-                        <option value="sejarah"  <?= ($data_edit['kategori'] ?? '') === 'sejarah'  ? 'selected' : '' ?>>Sejarah</option>
-                        <option value="biografi" <?= ($data_edit['kategori'] ?? '') === 'biografi' ? 'selected' : '' ?>>Biografi Tokoh</option>
+                        <?php foreach ($daftar_kategori as $kat): ?>
+                        <option value="<?= $kat['id_kategori'] ?>"
+                            <?= ($data_edit['id_kategori'] ?? '') == $kat['id_kategori'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($kat['nama_kategori']) ?>
+                        </option>
+                        <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="form-group">
@@ -730,8 +757,12 @@ function buildUrl($extra = []) {
                 </div>
                 <select name="kategori" class="select-filter" onchange="this.form.submit()">
                     <option value="">— Semua Kategori —</option>
-                    <option value="sejarah" <?= $filter_kat === 'sejarah' ? 'selected' : '' ?>>Sejarah</option>
-                    <option value="biografi" <?= $filter_kat === 'biografi' ? 'selected' : '' ?>>Biografi Tokoh</option>
+                    <?php foreach ($daftar_kategori as $kat): ?>
+                    <option value="<?= htmlspecialchars($kat['slug_kategori']) ?>"
+                        <?= $filter_kat === $kat['slug_kategori'] ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($kat['nama_kategori']) ?>
+                    </option>
+                    <?php endforeach; ?>
                 </select>
                 <select name="status" class="select-filter" onchange="this.form.submit()">
                     <option value="">— Semua Status —</option>
@@ -797,10 +828,13 @@ function buildUrl($extra = []) {
                         <div class="judul-cell" title="<?= htmlspecialchars($art['judul']) ?>"><?= htmlspecialchars($art['judul']) ?></div>
                     </td>
                     <td>
-                        <?php if ($art['kategori'] === 'sejarah'): ?>
-                            <span class="badge-new kat-sejarah"><i class='bx bx-history'></i> Sejarah</span>
+                        <?php if (!empty($art['nama_kategori'])): ?>
+                            <span class="badge-new kat-<?= htmlspecialchars($art['slug_kategori']) ?>">
+                                <i class='bx bx-folder'></i>
+                                <?= htmlspecialchars($art['nama_kategori']) ?>
+                            </span>
                         <?php else: ?>
-                            <span class="badge-new kat-biografi"><i class='bx bx-user'></i> Biografi</span>
+                            <span style="color:#9CA3AF;font-size:12px;">— Tanpa Kategori —</span>
                         <?php endif; ?>
                     </td>
                     <td class="cell-muted"><?= htmlspecialchars($art['penulis']) ?></td>

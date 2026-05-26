@@ -85,7 +85,7 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah_user') {
     $t_email    = mb_substr(strip_tags(trim($_POST['t_email'])),    0, 100);
     $t_username = mb_substr(strip_tags(trim($_POST['t_username'])), 0, 50);
     $t_password = trim($_POST['t_password']);
-    $t_role     = in_array($_POST['t_role'], ['admin','user']) ? $_POST['t_role'] : 'user';
+    $t_role     = in_array($_POST['t_role'], ['penulis','user']) ? $_POST['t_role'] : 'user';
 
     $err_tambah = [];
 
@@ -149,7 +149,7 @@ $sort_dir  = ($sort_dir === 'ASC') ? 'ASC' : 'DESC';
 $sort_next = ($sort_dir === 'ASC') ? 'DESC' : 'ASC';
 
 // Whitelist filter role
-$allowed_role = ['admin', 'user'];
+$allowed_role = ['admin', 'penulis', 'user'];
 if (!in_array($filter_role, $allowed_role)) $filter_role = '';
 
 // ===== BUILD QUERY AMAN =====
@@ -330,8 +330,9 @@ if (isset($_GET['msg']) && isset($notif_map[$_GET['msg']])) {
 /* BADGE */
 .up-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;
     border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
-.b-admin{background:var(--br-700);color:#fff}
-.b-user {background:var(--g200);color:var(--g600)}
+.b-admin  {background:var(--br-700);color:#fff}
+.b-penulis{background:#EFF6FF;color:#1D4ED8}
+.b-user   {background:var(--g200);color:var(--g600)}
 .up-date{color:var(--muted);font-size:12px;white-space:nowrap}
 .up-rownum{color:var(--g400);font-size:12px}
 
@@ -483,8 +484,9 @@ if (isset($_GET['msg']) && isset($notif_map[$_GET['msg']])) {
                 <select name="role" class="up-select"
                         onchange="document.getElementById('up-filter-form').submit()">
                     <option value="">Semua Role</option>
-                    <option value="admin" <?= $filter_role==='admin'?'selected':'' ?>>Admin</option>
-                    <option value="user"  <?= $filter_role==='user' ?'selected':'' ?>>User</option>
+                    <option value="admin"   <?= $filter_role==='admin'  ?'selected':'' ?>>Admin</option>
+                    <option value="penulis" <?= $filter_role==='penulis'?'selected':'' ?>>Penulis</option>
+                    <option value="user"    <?= $filter_role==='user'   ?'selected':'' ?>>User</option>
                 </select>
 
                 <!-- Refresh -->
@@ -579,6 +581,8 @@ if (isset($_GET['msg']) && isset($notif_map[$_GET['msg']])) {
                     <td>
                         <?php if ($u['role'] === 'admin'): ?>
                             <span class="up-badge b-admin"><i class='bx bx-shield'></i> Admin</span>
+                        <?php elseif ($u['role'] === 'penulis'): ?>
+                            <span class="up-badge b-penulis"><i class='bx bx-edit'></i> Penulis</span>
                         <?php else: ?>
                             <span class="up-badge b-user"><i class='bx bx-user'></i> User</span>
                         <?php endif ?>
@@ -721,8 +725,8 @@ if (isset($_GET['msg']) && isset($notif_map[$_GET['msg']])) {
                 <div class="up-form-group">
                     <label class="up-form-label">Role <span>*</span></label>
                     <select name="t_role" class="up-form-input">
-                        <option value="user"  <?= ($form_tambah['t_role']??'user')==='user' ?'selected':'' ?>>User</option>
-                        <option value="admin" <?= ($form_tambah['t_role']??'')==='admin'?'selected':'' ?>>Admin</option>
+                        <option value="penulis" <?= ($form_tambah['t_role']??'')==='penulis'?'selected':'' ?>>Penulis</option>
+                        <option value="user"    <?= ($form_tambah['t_role']??'user')==='user' ?'selected':'' ?>>User</option>
                     </select>
                 </div>
             </div>
