@@ -47,9 +47,9 @@ if (isset($_GET['hapus'])) {
         $del = $conn->prepare("DELETE FROM tb_user WHERE id = ? AND role != 'admin'");
         $del->bind_param("i", $hapus_id);
         $del->execute();
-        header("Location: dashboardAdmin.php?page=user&msg=hapus");
+        echo "<script>window.location.href='dashboardAdmin.php?page=user&msg=hapus';</script>";
     } else {
-        header("Location: dashboardAdmin.php?page=user&msg=error_admin");
+        echo "<script>window.location.href='dashboardAdmin.php?page=user&msg=error_admin';</script>";
     }
     exit();
 }
@@ -75,7 +75,7 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'peringatan') {
         );
     }
 
-    header("Location: dashboardAdmin.php?page=user&msg=peringatan");
+    echo "<script>window.location.href='dashboardAdmin.php?page=user&msg=peringatan';</script>";
     exit();
 }
 
@@ -85,7 +85,7 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah_user') {
     $t_email    = mb_substr(strip_tags(trim($_POST['t_email'])),    0, 100);
     $t_username = mb_substr(strip_tags(trim($_POST['t_username'])), 0, 50);
     $t_password = trim($_POST['t_password']);
-    $t_role     = in_array($_POST['t_role'], ['penulis','user']) ? $_POST['t_role'] : 'user';
+    $t_role     = 'penulis'; // Admin hanya dapat menambahkan akun Penulis
 
     $err_tambah = [];
 
@@ -115,16 +115,16 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'tambah_user') {
         );
         $ins->bind_param("sssss", $t_nama, $t_email, $t_username, $hash, $t_role);
         if ($ins->execute()) {
-            header("Location: dashboardAdmin.php?page=user&msg=tambah");
+            echo "<script>window.location.href='dashboardAdmin.php?page=user&msg=tambah';</script>";
         } else {
-            header("Location: dashboardAdmin.php?page=user&msg=error_tambah");
+            echo "<script>window.location.href='dashboardAdmin.php?page=user&msg=error_tambah';</script>";
         }
         exit();
     }
     // Ada error — simpan ke session supaya bisa ditampilkan di modal
     $_SESSION['err_tambah']  = $err_tambah;
-    $_SESSION['form_tambah'] = compact('t_nama','t_email','t_username','t_role');
-    header("Location: dashboardAdmin.php?page=user&modal=tambah");
+    $_SESSION['form_tambah'] = compact('t_nama','t_email','t_username');
+    echo "<script>window.location.href='dashboardAdmin.php?page=user&modal=tambah';</script>";
     exit();
 }
 
@@ -197,8 +197,8 @@ function userUrl($extra) {
 $notif_map = [
     'hapus'        => ['sukses',  '✅ User berhasil dihapus dari sistem.'],
     'peringatan'   => ['warning', '📩 Peringatan berhasil dikirim ke user.'],
-    'tambah'       => ['sukses',  '✅ User baru berhasil ditambahkan.'],
-    'error_tambah' => ['error',   '⛔ Gagal menambahkan user, coba lagi.'],
+    'tambah'       => ['sukses',  '✅ Penulis baru berhasil ditambahkan.'],
+    'error_tambah' => ['error',   '⛔ Gagal menambahkan penulis, coba lagi.'],
     'error_admin'  => ['error',   '⛔ Tidak dapat melakukan aksi pada akun admin.'],
 ];
 $pesan = $tipe = '';
@@ -658,14 +658,14 @@ if (isset($_GET['msg']) && isset($notif_map[$_GET['msg']])) {
 
 </div><!-- /up-card -->
 
-<!-- MODAL TAMBAH USER -->
+<!-- MODAL TAMBAH PENULIS -->
 <div class="up-modal-ov" id="up-modal-tambah">
     <div class="up-modal-box" style="max-width:500px">
         <div class="up-modal-title">
             <i class='bx bx-user-plus' style="color:var(--green-tx);margin-right:6px"></i>
-            Tambah User Baru
+            Tambah Penulis Baru
         </div>
-        <div class="up-modal-sub">Isi data lengkap untuk membuat akun user baru.</div>
+        <div class="up-modal-sub">Isi data lengkap untuk membuat akun penulis baru.</div>
 
         <?php if (!empty($err_tambah)): ?>
         <ul class="up-form-err-list">
@@ -676,7 +676,8 @@ if (isset($_GET['msg']) && isset($notif_map[$_GET['msg']])) {
         <?php endif ?>
 
         <form method="post" action="dashboardAdmin.php?page=user" id="up-form-tambah">
-            <input type="hidden" name="aksi" value="tambah_user">
+            <input type="hidden" name="aksi"   value="tambah_user">
+            <input type="hidden" name="t_role" value="penulis">
 
             <!-- Nama Lengkap -->
             <div class="up-form-row full" style="margin-bottom:12px">
@@ -707,8 +708,8 @@ if (isset($_GET['msg']) && isset($notif_map[$_GET['msg']])) {
                 </div>
             </div>
 
-            <!-- Password & Role -->
-            <div class="up-form-row" style="margin-bottom:12px">
+            <!-- Password (full width) -->
+            <div class="up-form-row full" style="margin-bottom:12px">
                 <div class="up-form-group">
                     <label class="up-form-label">Password <span>*</span></label>
                     <div class="up-pwd-wrap">
@@ -722,20 +723,13 @@ if (isset($_GET['msg']) && isset($notif_map[$_GET['msg']])) {
                     </div>
                     <span class="up-form-hint">Minimal 6 karakter</span>
                 </div>
-                <div class="up-form-group">
-                    <label class="up-form-label">Role <span>*</span></label>
-                    <select name="t_role" class="up-form-input">
-                        <option value="penulis" <?= ($form_tambah['t_role']??'')==='penulis'?'selected':'' ?>>Penulis</option>
-                        <option value="user"    <?= ($form_tambah['t_role']??'user')==='user' ?'selected':'' ?>>User</option>
-                    </select>
-                </div>
             </div>
 
             <div class="up-modal-divider"></div>
             <div class="up-modal-foot">
                 <button type="button" class="up-modal-cancel" onclick="upCloseTambah()">Batal</button>
                 <button type="submit" class="up-modal-ok" style="background:var(--green-tx)">
-                    <i class='bx bx-user-plus'></i> Simpan User
+                    <i class='bx bx-user-plus'></i> Simpan Penulis
                 </button>
             </div>
         </form>
@@ -782,7 +776,7 @@ function upConfirmHapus(nama) {
     return confirm('Hapus user "' + nama + '"?\n\nData dihapus permanen dan tidak bisa dikembalikan.');
 }
 
-// Modal Tambah User
+// Modal Tambah Penulis
 function upOpenTambah() {
     document.getElementById('up-modal-tambah').classList.add('show');
 }

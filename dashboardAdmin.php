@@ -1,18 +1,14 @@
 <?php
-// dashboardAdmin.php — File utama admin (Modul 18: Pemanggilan Halaman)
+// dashboardAdmin.php
 include "cek_admin.php";
 include "koneksi.php";
 
-// Whitelist halaman yang boleh dipanggil (keamanan dari LFI)
-$allowed = ['dashboard', 'artikel', 'user', 'kategori'];
+$allowed = ['dashboard', 'artikel', 'user', 'kategori', 'verifikasi'];
+$page    = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
+if (!in_array($page, $allowed)) $page = 'dashboard';
 
-// Ambil parameter ?page= dari URL, default: dashboard
-$page = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
-
-// Kalau halaman tidak ada di whitelist, paksa ke dashboard
-if (!in_array($page, $allowed)) {
-    $page = 'dashboard';
-}
+// Badge sidebar: hitung artikel pending
+$_vf_count = $conn->query("SELECT COUNT(*) AS total FROM tb_artikel WHERE status = 'pending'")->fetch_assoc()['total'];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -45,10 +41,9 @@ if (!in_array($page, $allowed)) {
             min-height: 100vh;
         }
 
-        /* ===== SIDEBAR ===== */
+        /* SIDEBAR */
         .sidebar {
-            width: 250px;
-            flex-shrink: 0;
+            width: 250px; flex-shrink: 0;
             background-color: #4A2C18;
             padding: 2rem 0.5rem;
             color: white;
@@ -64,9 +59,8 @@ if (!in_array($page, $allowed)) {
         .sidebar.is-open { left: 0; }
 
         .menu-toggle {
-            background: none; border: none;
-            cursor: pointer; padding: 0.5rem;
-            margin-right: 1rem; color: #4A2C18;
+            background: none; border: none; cursor: pointer;
+            padding: 0.5rem; margin-right: 1rem; color: #4A2C18;
             display: block; border-radius: 0.375rem;
             transition: background-color 0.2s;
         }
@@ -80,24 +74,17 @@ if (!in_array($page, $allowed)) {
         }
         .overlay.is-active { display: block; }
 
-        .main-content-area {
-            flex-grow: 1;
-            padding: 1rem;
-            width: 100%;
-        }
+        .main-content-area { flex-grow: 1; padding: 1rem; width: 100%; }
 
         @media (min-width: 1024px) {
             body { flex-direction: row; }
-            .sidebar {
-                position: sticky; left: 0 !important;
-                top: 0; height: 100vh; z-index: 10;
-            }
+            .sidebar { position: sticky; left: 0 !important; top: 0; height: 100vh; z-index: 10; }
             .menu-toggle { display: none; }
             .main-content-area { padding: 2rem; }
             .overlay.is-active { display: none; }
         }
 
-        /* ===== NAV ===== */
+        /* NAV */
         .sidebar-header {
             margin-bottom: 2rem; padding-bottom: 1rem;
             border-bottom: 1px solid rgba(255,255,255,0.3);
@@ -117,32 +104,41 @@ if (!in_array($page, $allowed)) {
             font-weight: bold;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
         }
-        .icon {
-            fill: currentColor; margin-right: 0.75rem;
-            width: 1.25rem; height: 1.25rem;
+        .icon { fill: currentColor; margin-right: 0.75rem; width: 1.25rem; height: 1.25rem; flex-shrink: 0; }
+
+        /* Badge merah untuk menu verifikasi */
+        .nav-badge {
+            margin-left: auto;
+            background: #ef4444;
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
         }
 
-        /* ===== HEADER ===== */
+        .nav-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.2);
+            margin: 0.75rem 1rem;
+        }
+
+        /* HEADER */
         .main-header {
             margin-bottom: 1.5rem;
             display: flex; align-items: center;
             justify-content: space-between;
         }
         .header-left { display: flex; align-items: center; }
-        .logo-img {
-            width: 3rem; height: 3rem;
-            border-radius: 50%; margin-right: 0.75rem;
-        }
-        .logo-text-img {
-            height: 45px; width: auto;
-            margin-left: -15px; position: relative; bottom: 3px;
-        }
+        .logo-img { width: 3rem; height: 3rem; border-radius: 50%; margin-right: 0.75rem; }
+        .logo-text-img { height: 45px; width: auto; margin-left: -15px; position: relative; bottom: 3px; }
 
-        /* Info admin di kanan header */
-        .admin-info {
-            display: flex; align-items: center; gap: 10px;
-            font-size: 14px; color: #555;
-        }
+        .admin-info { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #555; }
         .admin-info strong { color: #4A2C18; }
         .btn-logout {
             background: #4A2C18; color: white;
@@ -155,17 +151,16 @@ if (!in_array($page, $allowed)) {
 </head>
 <body>
 
-<!-- ===== SIDEBAR ===== -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
         <h1 class="text-xl font-bold">Sejiwa Admin</h1>
-        <p class="text-xs text-white/60 mt-1">Halo, <?= $_SESSION['nama_lengkap'] ?>!</p>
+        <p class="text-xs text-white/60 mt-1">Halo, <?= htmlspecialchars($_SESSION['nama_lengkap']) ?>!</p>
     </div>
 
     <nav class="sidebar-nav">
         <ul>
             <li class="nav-item">
-                <a href="dashboardAdmin.php?page=dashboard" 
+                <a href="dashboardAdmin.php?page=dashboard"
                    class="<?= $page === 'dashboard' ? 'active' : '' ?>">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
@@ -200,7 +195,24 @@ if (!in_array($page, $allowed)) {
                     Data User
                 </a>
             </li>
-            <li class="nav-item" style="margin-top: 2rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1rem;">
+
+            <!-- VERIFIKASI ARTIKEL — menu baru -->
+            <li class="nav-item">
+                <a href="dashboardAdmin.php?page=verifikasi"
+                   class="<?= $page === 'verifikasi' ? 'active' : '' ?>">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+                    </svg>
+                    Verifikasi Artikel
+                    <?php if ($_vf_count > 0): ?>
+                        <span class="nav-badge"><?= $_vf_count > 99 ? '99+' : $_vf_count ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+
+            <li><div class="nav-divider"></div></li>
+
+            <li class="nav-item">
                 <a href="logout.php">
                     <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                         <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5-5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
@@ -212,12 +224,9 @@ if (!in_array($page, $allowed)) {
     </nav>
 </aside>
 
-<!-- ===== KONTEN UTAMA ===== -->
 <div class="main-content-area">
-
     <header class="main-header">
         <div class="header-left">
-            <!-- Tombol burger (mobile) -->
             <button id="sidebarToggle" class="menu-toggle">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/>
@@ -227,19 +236,16 @@ if (!in_array($page, $allowed)) {
             <img src="sejput.png" alt="Sejiwa" class="logo-text-img">
         </div>
         <div class="admin-info">
-            <span>👤 <strong><?= $_SESSION['nama_lengkap'] ?></strong> (Admin)</span>
+            <span>👤 <strong><?= htmlspecialchars($_SESSION['nama_lengkap']) ?></strong> (Admin)</span>
             <a href="logout.php" class="btn-logout">Logout</a>
         </div>
     </header>
 
-    <!-- Konten halaman dipanggil sesuai ?page= (Modul 18) -->
     <main>
         <?php include "pages/$page.php"; ?>
     </main>
-
 </div>
 
-<!-- Overlay mobile -->
 <div class="overlay" id="sidebarOverlay"></div>
 
 <script>
@@ -262,6 +268,5 @@ if (!in_array($page, $allowed)) {
         }
     });
 </script>
-
 </body>
 </html>

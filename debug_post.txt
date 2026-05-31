@@ -1,0 +1,22 @@
+Array
+(
+    [aksi] => edit
+    [id] => 1
+    [status_value] => published
+    [judul] => Proklamasi Kemerdekaan Indonesiaaa
+    [penulis] => Admin
+    [id_kategori] => 1
+    [status] => published
+    [preview] => Indonesia memperingati Hari Kemerdekaan RI ke-79 pada 17 Agustus 2024. Namun, apakah kalian tahu bagaimana sejarah dari kemerdekaan Indonesia?
+Proklamasi Kemerdekaan Republik Indonesia pada 17 Agustus 1945 bermula dari berita Jepang yang telah menyerah tanpa syarat kepada Sekutu setelah Kota Hiroshima dan Nagasaki dibom pada 15 Agustus. Kabar ini disampaikan oleh Radio BBC dan didengar oleh para pejuang muda yang kemudian mendesak Soekarno dan Hatta untuk segera memanfaatkan momentum tersebut untuk memproklamasikan kemerdekaan.
+Desakan ini memicu perdebatan antara golongan muda dan golongan tua karena belum ada pernyataan resmi dari Jepang. Golongan tua meminta untuk menunggu hingga 24 Agustus 1945.
+    [konten] => <p>Indonesia memperingati Hari Kemerdekaan RI ke-79 pada 17 Agustus 2024. Namun, apakah kalian tahu bagaimana sejarah dari kemerdekaan Indonesia?</p>
+<p>Proklamasi Kemerdekaan Republik Indonesia pada 17 Agustus 1945 bermula dari berita Jepang yang telah menyerah tanpa syarat kepada Sekutu setelah Kota Hiroshima dan Nagasaki dibom pada 15 Agustus. Kabar ini disampaikan oleh Radio BBC dan didengar oleh para pejuang muda yang kemudian mendesak Soekarno dan Hatta untuk segera memanfaatkan momentum tersebut untuk memproklamasikan kemerdekaan.</p>
+<p>Desakan ini memicu perdebatan antara golongan muda dan golongan tua karena belum ada pernyataan resmi dari Jepang. Golongan tua meminta untuk menunggu hingga 24 Agustus 1945.</p>
+<p>Pada 15 Agustus 1945, Soekarno dan Hatta, di bawah koordinasi Sukarni, Chaerul Saleh, dan Wikana, dibawa ke Rengasdengklok dengan harapan mempercepat kemerdekaan. Sukarno dan Hatta kemudian kembali bersama Ahmad Soebardjo dengan jaminan bahwa proklamasi akan dilakukan esok harinya.</p>
+<p>Malam itu, mereka berkumpul di rumah Laksamana Maeda untuk membahas masalah tersebut. Pada 17 Agustus 1945 pukul 03.00 WIB, naskah proklamasi yang terdiri dari dua alinea selesai disusun dalam waktu dua jam.</p>
+<p>Naskah proklamasi kemudian diserahkan kepada Sayuti Melik untuk diketik, dengan pendampingan dari BM Diah. Setelah selesai, naskah ditandatangani oleh Sukarno. Beberapa jam kemudian, pada pukul 10.00 WIB, naskah proklamasi dibacakan di rumah Soekarno di Jalan Pegangsaan Timur Nomor 56.</p>
+<p>Pembacaan proklamasi disambut dengan penuh haru dan kegembiraan oleh rakyat Indonesia. Para pemuda, tokoh masyarakat, dan berbagai lapisan rakyat berkumpul untuk menyaksikan momen bersejarah tersebut. Bendera Merah Putih dikibarkan untuk pertama kalinya sebagai simbol kemerdekaan bangsa.</p>
+<p>Setelah proklamasi, perjuangan belum selesai. Indonesia masih harus mempertahankan kemerdekaannya dari ancaman penjajahan kembali oleh Belanda yang datang bersama pasukan Sekutu. Berbagai pertempuran heroik terjadi di berbagai penjuru nusantara untuk mempertahankan kemerdekaan yang baru saja diraih.</p>
+<p>Proklamasi 17 Agustus 1945 menjadi tonggak sejarah terpenting bagi bangsa Indonesia, mengakhiri ratusan tahun penjajahan dan membuka lembaran baru sebagai bangsa yang merdeka dan berdaulat di dunia internasional.</p>
+)
