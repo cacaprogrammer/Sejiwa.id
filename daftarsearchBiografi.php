@@ -1,21 +1,29 @@
 <?php
 session_start();
-if (!isset($_SESSION['username'])) {
-    header("Location: loginpage.php");
-    exit();
-}
-if ($_SESSION['role'] === 'admin') {
-    header("Location: dashboardAdmin.php");
-    exit();
-}
+
+// PERBAIKAN: Hapus redirect login - guest bisa akses
+// if (!isset($_SESSION['username'])) {
+//     header("Location: loginpage.php");
+//     exit();
+// }
+// if ($_SESSION['role'] === 'admin') {
+//     header("Location: dashboardAdmin.php");
+//     exit();
+// }
 
 require_once 'koneksi.php';
 
-// Hitung notif belum dibaca
-$_nb_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM tb_notifikasi WHERE user_id = ? AND dibaca = 0");
-$_nb_stmt->bind_param("i", $_SESSION['id']);
-$_nb_stmt->execute();
-$_nb_count = $_nb_stmt->get_result()->fetch_assoc()['total'];
+// Variable untuk cek status login (tanpa redirect)
+$isLoggedIn = isset($_SESSION['username']);
+
+// Hitung notif hanya jika user login
+$_nb_count = 0;
+if ($isLoggedIn) {
+    $_nb_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM tb_notifikasi WHERE user_id = ? AND dibaca = 0");
+    $_nb_stmt->bind_param("i", $_SESSION['id']);
+    $_nb_stmt->execute();
+    $_nb_count = $_nb_stmt->get_result()->fetch_assoc()['total'];
+}
 
 // Ambil semua artikel kategori 'biografi' yang published
 $q = $conn->query("
@@ -235,16 +243,17 @@ $list_artikel = $q ? $q->fetch_all(MYSQLI_ASSOC) : [];
     function toggleDropdown(event) {
         event.preventDefault();
         const menu = document.getElementById('dropdown-menu');
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
+        if (menu) menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
     }
     document.addEventListener('click', function(e) {
         const menu = document.getElementById('dropdown-menu');
         const dd = document.querySelector('.dropdown');
-        if (dd && !dd.contains(e.target)) menu.style.display = 'none';
+        if (menu && dd && !dd.contains(e.target)) menu.style.display = 'none';
     });
     function toggleProfileDropdown(event) {
         event.stopPropagation();
-        document.getElementById('profile-dropdown-menu').classList.toggle('show');
+        const menu = document.getElementById('profile-dropdown-menu');
+        if (menu) menu.classList.toggle('show');
     }
     document.addEventListener('click', function(e) {
         const pd = document.getElementById('profile-dropdown');
@@ -255,11 +264,13 @@ $list_artikel = $q ? $q->fetch_all(MYSQLI_ASSOC) : [];
     const hamburgerBtn = document.getElementById('hamburger-btn');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
     function openSidebar() {
+        if (!sidebar) return;
         const w = window.innerWidth;
-        sidebar.style.width = w < 350 ? '90%' : w < 450 ? '300px' : '250px';
+        sidebar.style.width = w < 350 ? '90%' : (w < 450 ? '300px' : '250px');
         document.body.style.overflow = 'hidden';
     }
     function closeSidebar() {
+        if (!sidebar) return;
         sidebar.style.width = '0';
         document.body.style.overflow = '';
         const ad = document.querySelector('.dropdown-menu-sidebar[style*="display: block"]');
@@ -268,11 +279,13 @@ $list_artikel = $q ? $q->fetch_all(MYSQLI_ASSOC) : [];
     function toggleDropdownSidebar(event) {
         event.preventDefault();
         const dd = event.target.nextElementSibling;
-        document.querySelectorAll('.dropdown-menu-sidebar').forEach(d => { if (d !== dd) d.style.display = 'none'; });
-        dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+        if (dd && dd.classList && dd.classList.contains('dropdown-menu-sidebar')) {
+            document.querySelectorAll('.dropdown-menu-sidebar').forEach(d => { if (d !== dd) d.style.display = 'none'; });
+            dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
+        }
     }
-    hamburgerBtn.addEventListener('click', openSidebar);
-    closeSidebarBtn.addEventListener('click', closeSidebar);
+    if (hamburgerBtn) hamburgerBtn.addEventListener('click', openSidebar);
+    if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
 
     // PENCARIAN
     const HISTORY_KEY = 'sejiwa_biografi_history';
@@ -292,32 +305,49 @@ $list_artikel = $q ? $q->fetch_all(MYSQLI_ASSOC) : [];
     function clearAllHistory()     { saveHistory([]); renderHistory(); }
 
     function renderHistory() {
+        if (!historyList) return;
         const history = getHistory();
         historyList.innerHTML = '';
         if (!history.length) { historyList.innerHTML = '<p style="color:#d7ccc8;font-size:.85em;padding:6px 20px 10px;">Belum ada riwayat pencarian.</p>'; return; }
         history.forEach(kw => {
             const item = document.createElement('div');
             item.className = 'history-item';
-            item.innerHTML = `<i class="fas fa-history"></i><span class="history-text">${kw}</span><i class="fas fa-times-circle"></i>`;
-            item.querySelector('.history-text').addEventListener('click', () => { searchInput.value = kw; filterCards(kw); toggleClear(); historyDropdown.classList.remove('show'); });
+            item.innerHTML = `<i class="fas fa-history"></i><span class="history-text">${escapeHtml(kw)}</span><i class="fas fa-times-circle"></i>`;
+            item.querySelector('.history-text').addEventListener('click', () => { searchInput.value = kw; filterCards(kw); toggleClear(); if (historyDropdown) historyDropdown.classList.remove('show'); });
             item.querySelector('.fa-times-circle').addEventListener('click', e => { e.stopPropagation(); removeHistoryItem(kw); });
             historyList.appendChild(item);
         });
     }
+    
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
     function filterCards(kw) {
         const q = kw.trim().toLowerCase();
         let vis = 0;
-        cards.forEach(c => { const t = c.getAttribute('data-title').toLowerCase(); if (!q || t.includes(q)) { c.classList.remove('hidden'); vis++; } else c.classList.add('hidden'); });
-        noResult.style.display = (q && !vis) ? 'block' : 'none';
-        if (q && !vis) noResultKw.textContent = kw;
+        cards.forEach(c => { const t = c.getAttribute('data-title'); if (t) { const title = t.toLowerCase(); if (!q || title.includes(q)) { c.classList.remove('hidden'); vis++; } else c.classList.add('hidden'); } });
+        if (noResult && noResultKw) {
+            noResult.style.display = (q && !vis) ? 'block' : 'none';
+            if (q && !vis) noResultKw.textContent = kw;
+        }
     }
-    function toggleClear() { searchInput.value.length ? searchClear.classList.add('visible') : searchClear.classList.remove('visible'); }
+    function toggleClear() { if (searchClear) searchInput.value.length ? searchClear.classList.add('visible') : searchClear.classList.remove('visible'); }
 
-    searchInput.addEventListener('input', function() { filterCards(this.value); toggleClear(); if (this.value.trim()) historyDropdown.classList.remove('show'); else { renderHistory(); historyDropdown.classList.add('show'); } });
-    searchInput.addEventListener('focus', function() { if (!this.value.trim()) { renderHistory(); historyDropdown.classList.add('show'); } });
-    searchInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { const kw = this.value.trim(); if (kw) { addToHistory(kw); filterCards(kw); } historyDropdown.classList.remove('show'); this.blur(); } });
-    searchClear.addEventListener('click', function() { searchInput.value = ''; filterCards(''); toggleClear(); renderHistory(); historyDropdown.classList.add('show'); searchInput.focus(); });
-    document.body.addEventListener('click', function(e) { const sc = document.querySelector('.search-container'); if (sc && !sc.contains(e.target)) { const kw = searchInput.value.trim(); if (kw) addToHistory(kw); setTimeout(() => historyDropdown.classList.remove('show'), 100); } });
+    if (searchInput) {
+        searchInput.addEventListener('input', function() { filterCards(this.value); toggleClear(); if (this.value.trim() && historyDropdown) historyDropdown.classList.remove('show'); else { renderHistory(); if (historyDropdown) historyDropdown.classList.add('show'); } });
+        searchInput.addEventListener('focus', function() { if (!this.value.trim()) { renderHistory(); if (historyDropdown) historyDropdown.classList.add('show'); } });
+        searchInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') { const kw = this.value.trim(); if (kw) { addToHistory(kw); filterCards(kw); } if (historyDropdown) historyDropdown.classList.remove('show'); this.blur(); } });
+    }
+    if (searchClear) {
+        searchClear.addEventListener('click', function() { if (searchInput) { searchInput.value = ''; filterCards(''); toggleClear(); renderHistory(); if (historyDropdown) historyDropdown.classList.add('show'); searchInput.focus(); } });
+    }
+    document.body.addEventListener('click', function(e) { const sc = document.querySelector('.search-container'); if (sc && !sc.contains(e.target) && searchInput) { const kw = searchInput.value.trim(); if (kw) addToHistory(kw); if (historyDropdown) setTimeout(() => historyDropdown.classList.remove('show'), 100); } });
 </script>
 </body>
 </html>

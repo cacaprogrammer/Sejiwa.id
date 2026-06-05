@@ -3,12 +3,27 @@ session_start();
 
 // 1. Jika user sudah login, langsung redirect otomatis sesuai role
 if (isset($_SESSION['username'])) {
-    if ($_SESSION['role'] === 'admin') {
-        header("Location: dashboardAdmin.php");
-    } elseif ($_SESSION['role'] === 'penulis') {
-        header("Location: pages/artikel_penulis.php"); // PERBAIKAN: Mengarah ke file artikel_penulis.php
+    // ✅ PERBAIKAN: Validasi ulang user masih ada di database
+    include "koneksi.php";
+    $check_user = $conn->prepare("SELECT id, role FROM tb_user WHERE id = ? LIMIT 1");
+    $check_user->bind_param("i", $_SESSION['id']);
+    $check_user->execute();
+    $result = $check_user->get_result();
+    
+    if ($result->num_rows > 0) {
+        // User masih ada, redirect sesuai role
+        $user_data = $result->fetch_assoc();
+        if ($user_data['role'] === 'admin') {
+            header("Location: dashboardAdmin.php");
+        } elseif ($user_data['role'] === 'penulis') {
+            header("Location: pages/artikel_penulis.php");
+        } else {
+            header("Location: landingpagepilihanfix.php");
+        }
     } else {
-        header("Location: landingpagepilihanfix.php");
+        // ⚠️ User sudah dihapus dari database, hapus session dan kembali ke login
+        session_destroy();
+        header("Location: loginpage.php?pesan=akun_dihapus");
     }
     exit();
 }
@@ -16,6 +31,15 @@ if (isset($_SESSION['username'])) {
 include "koneksi.php";
 
 $pesan = "";
+$tipe_pesan = "";
+
+// Pesan dari parameter GET
+if (isset($_GET['pesan'])) {
+    if ($_GET['pesan'] === 'akun_dihapus') {
+        $pesan = "Akun Anda telah dihapus dari sistem. Hubungi admin jika ada pertanyaan.";
+        $tipe_pesan = "warning";
+    }
+}
 
 if (isset($_POST['submit'])) {
     $email    = trim($_POST['email']);
@@ -41,16 +65,18 @@ if (isset($_POST['submit'])) {
             if ($user['role'] === 'admin') {
                 header("Location: dashboardAdmin.php");
             } elseif ($user['role'] === 'penulis') {
-                header("Location: pages/artikel_penulis.php"); // PERBAIKAN: Mengarah ke file artikel_penulis.php
+                header("Location: pages/artikel_penulis.php");
             } else {
                 header("Location: landingpagepilihanfix.php");
             }
             exit();
         } else {
             $pesan = "Kata sandi salah!";
+            $tipe_pesan = "error";
         }
     } else {
         $pesan = "Email tidak ditemukan!";
+        $tipe_pesan = "error";
     }
 }
 ?>
@@ -141,6 +167,20 @@ if (isset($_POST['submit'])) {
       background: #fff0f0;
       color: #c0392b;
       border: 1px solid #fccaca;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12.5px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Pesan warning */
+    .pesan-warning {
+      background: #fffaed;
+      color: #92400e;
+      border: 1px solid #fcd34d;
       border-radius: 10px;
       padding: 10px 14px;
       font-size: 12.5px;
@@ -337,8 +377,8 @@ if (isset($_POST['submit'])) {
     <p class="subtitle">Masuk ke akun kamu untuk mulai menjelajah</p>
 
     <?php if ($pesan != ""): ?>
-      <div class="pesan-error">
-        <i class="fa-solid fa-circle-exclamation"></i>
+      <div class="pesan-<?= $tipe_pesan ?>">
+        <i class="fa-solid fa-<?= $tipe_pesan === 'error' ? 'circle-exclamation' : 'triangle-exclamation' ?>"></i>
         <?= $pesan ?>
       </div>
     <?php endif; ?>

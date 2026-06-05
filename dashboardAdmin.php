@@ -3,7 +3,20 @@
 include "cek_admin.php";
 include "koneksi.php";
 
-$allowed = ['dashboard', 'artikel', 'user', 'kategori', 'verifikasi'];
+// ✅ PERBAIKAN: Validasi ulang apakah user (admin) masih ada di database
+$verify_admin = $conn->prepare("SELECT id, role, status FROM tb_user WHERE id = ? AND role = 'admin' LIMIT 1");
+$verify_admin->bind_param("i", $_SESSION['id']);
+$verify_admin->execute();
+$admin_result = $verify_admin->get_result();
+
+if ($admin_result->num_rows === 0) {
+    // Admin sudah dihapus atau bukan admin lagi!
+    session_destroy();
+    header("Location: loginpage.php?pesan=akun_dihapus");
+    exit();
+}
+
+$allowed = ['dashboard', 'artikel', 'user', 'kategori', 'verifikasi', 'ulasan'];
 $page    = isset($_GET['page']) ? $_GET['page'] : 'dashboard';
 if (!in_array($page, $allowed)) $page = 'dashboard';
 
@@ -140,13 +153,6 @@ $_vf_count = $conn->query("SELECT COUNT(*) AS total FROM tb_artikel WHERE status
 
         .admin-info { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #555; }
         .admin-info strong { color: #4A2C18; }
-        .btn-logout {
-            background: #4A2C18; color: white;
-            padding: 6px 14px; border-radius: 8px;
-            text-decoration: none; font-size: 13px;
-            transition: background 0.2s;
-        }
-        .btn-logout:hover { background: #6B3E23; }
     </style>
 </head>
 <body>
@@ -196,7 +202,18 @@ $_vf_count = $conn->query("SELECT COUNT(*) AS total FROM tb_artikel WHERE status
                 </a>
             </li>
 
-            <!-- VERIFIKASI ARTIKEL — menu baru -->
+            <!-- KELOLA ULASAN -->
+            <li class="nav-item">
+                <a href="dashboardAdmin.php?page=ulasan"
+                   class="<?= $page === 'ulasan' ? 'active' : '' ?>">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 12H7v-2h10v2zm0-3H7V9h10v2zm0-3H7V6h10v2z"/>
+                    </svg>
+                    Kelola Ulasan
+                </a>
+            </li>
+
+            <!-- VERIFIKASI ARTIKEL -->
             <li class="nav-item">
                 <a href="dashboardAdmin.php?page=verifikasi"
                    class="<?= $page === 'verifikasi' ? 'active' : '' ?>">
@@ -237,7 +254,6 @@ $_vf_count = $conn->query("SELECT COUNT(*) AS total FROM tb_artikel WHERE status
         </div>
         <div class="admin-info">
             <span>👤 <strong><?= htmlspecialchars($_SESSION['nama_lengkap']) ?></strong> (Admin)</span>
-            <a href="logout.php" class="btn-logout">Logout</a>
         </div>
     </header>
 

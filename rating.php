@@ -13,13 +13,11 @@ if ($_SESSION['role'] === 'admin') {
 
 require_once 'koneksi.php';
 
-// Notif belum dibaca
 $_nb_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM tb_notifikasi WHERE user_id = ? AND dibaca = 0");
 $_nb_stmt->bind_param("i", $_SESSION['id']);
 $_nb_stmt->execute();
 $_nb_count = $_nb_stmt->get_result()->fetch_assoc()['total'];
 
-// Data user + foto profil
 $stmt_user = $conn->prepare("SELECT * FROM tb_user WHERE id = ?");
 $stmt_user->bind_param("i", $_SESSION['id']);
 $stmt_user->execute();
@@ -35,10 +33,8 @@ if ($foto && file_exists("uploads/" . $foto)) {
 $user_nama = htmlspecialchars($_SESSION['nama_lengkap'] ?? $_SESSION['username']);
 $user_id   = (int)($_SESSION['id'] ?? 0);
 
-// Ambil artikel_id dari query string
 $artikel_id = (int)($_GET['artikel_id'] ?? 0);
 
-// Ambil data artikel jika ada
 $artikel_data = null;
 if ($artikel_id > 0) {
     $sa = $conn->prepare("SELECT id, judul, thumbnail, slug FROM tb_artikel WHERE id = ?");
@@ -47,7 +43,6 @@ if ($artikel_id > 0) {
     $artikel_data = $sa->get_result()->fetch_assoc();
 }
 
-// Ambil semua ulasan artikel ini dari DB
 $ulasan_list = [];
 if ($artikel_id > 0) {
     $su = $conn->prepare("
@@ -66,7 +61,6 @@ if ($artikel_id > 0) {
     }
 }
 
-// Rata-rata rating
 $rata_rating = 0;
 if (count($ulasan_list) > 0) {
     $rata_rating = round(array_sum(array_column($ulasan_list, 'rating')) / count($ulasan_list));
@@ -82,111 +76,54 @@ if (count($ulasan_list) > 0) {
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; line-height: 1.6; background-color: #f7f7f7; }
-
-        /* LAYOUT */
-        .main-content-section {
-            display: flex; justify-content: flex-start;
-            padding: 50px; align-items: flex-start; gap: 60px;
-        }
-
-        /* KARTU ARTIKEL */
-        .kartu-artikel {
-            width: 250px; padding: 10px; background-color: #4a2c18;
-            border-radius: 20px; text-align: center;
-            box-shadow: 0 6px 12px rgba(0,0,0,0.4); flex-shrink: 0;
-        }
+        .main-content-section { display: flex; justify-content: flex-start; padding: 50px; align-items: flex-start; gap: 60px; }
+        .kartu-artikel { width: 250px; padding: 10px; background-color: #4a2c18; border-radius: 20px; text-align: center; box-shadow: 0 6px 12px rgba(0,0,0,0.4); flex-shrink: 0; }
         .area-gambar { width: 100%; height: 315px; border-radius: 15px; margin-bottom: 8px; overflow: hidden; }
         .gambar-utama { width: 100%; height: 100%; object-fit: cover; background-color: #724636; display: block; }
         .judul-artikel { font-size: 17px; margin: 0 0 4px 0; color: #fff; font-weight: bold; }
         .rating-bintang { font-size: 23px; color: #fbbf24; margin-bottom: 10px; position: relative; top: -8px; }
-        .tombol-baca {
-            display: flex; align-items: center; justify-content: center;
-            padding: 8px 15px; background-color: #f7f7f7; color: #000;
-            border: none; border-radius: 25px; cursor: pointer; margin-bottom: 5px;
-            width: 100%; font-size: 13px; font-weight: bold; text-decoration: none;
-        }
+        .tombol-baca { display: flex; align-items: center; justify-content: center; padding: 8px 15px; background-color: #f7f7f7; color: #000; border: none; border-radius: 25px; cursor: pointer; margin-bottom: 5px; width: 100%; font-size: 13px; font-weight: bold; text-decoration: none; }
         .tombol-baca:hover { background-color: #e0d8d4; }
         .ikon-panah { width: 18px; height: 18px; margin-left: 5px; object-fit: contain; }
-
-        /* AREA ULASAN */
         .container-ulasan { width: 100%; max-width: 700px; }
         hr { border: 0; height: 1px; background: #e0e0e0; margin: 20px 0; }
-
-        .form-tulis-ulasan {
-            padding: 15px; background-color: #fff;
-            border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+        .form-tulis-ulasan { padding: 15px; background-color: #fff; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
         .judul-form { font-size: 1.1em; font-weight: bold; color: #333; margin-bottom: 15px; }
-        .info-artikel-aktif {
-            background: #f5ede8; border-left: 4px solid #4a2c18;
-            border-radius: 6px; padding: 10px 14px; margin-bottom: 15px;
-            font-size: 13px; color: #4a2c18;
-        }
+        .info-artikel-aktif { background: #f5ede8; border-left: 4px solid #4a2c18; border-radius: 6px; padding: 10px 14px; margin-bottom: 15px; font-size: 13px; color: #4a2c18; }
         .info-artikel-aktif strong { font-weight: bold; }
-
         .input-profil { display: flex; align-items: center; margin-bottom: 10px; gap: 8px; }
         .avatar-form { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background-color: #ccc; flex-shrink: 0; }
         .nama-pengguna-form { font-weight: bold; color: #555; }
-
-        .rating-input { font-size: 1.4em; cursor: pointer; display: flex; gap: 3px; margin-left: auto; }
-        .rating-input .star { color: #aaa; transition: color 0.15s; user-select: none; }
-        .rating-input .star.aktif, .rating-input .star.hover { color: #ffc107; }
-
-        .send-icon-wrapper {
-            width: 32px; height: 32px; display: flex; align-items: center;
-            justify-content: center; background-color: #4a2c18; border-radius: 50%;
-            cursor: pointer; transition: background-color 0.3s; border: none;
-        }
+        .rating-input { font-size: 1.8em; cursor: pointer; display: flex; gap: 4px; margin-left: auto; }
+        .rating-input .star { color: #ddd; transition: color 0.15s; user-select: none; line-height: 1; }
+        .rating-input .star.aktif { color: #ffc107; }
+        .rating-input .star.hover { color: #ffc107; }
+        .send-icon-wrapper { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background-color: #4a2c18; border-radius: 50%; cursor: pointer; transition: background-color 0.3s; border: none; flex-shrink: 0; }
         .send-icon-wrapper:hover { background-color: #724636; }
         .send-icon-wrapper:disabled { background-color: #aaa; cursor: not-allowed; }
         .ikon-kirim { color: #fff; font-size: 14px; }
-
-        .input-komentar {
-            width: 100%; min-height: 80px; padding: 10px;
-            border: 1px solid #ccc; border-radius: 4px;
-            resize: vertical; font-size: 1em; font-family: Arial, sans-serif;
-        }
+        .input-komentar { width: 100%; min-height: 80px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-size: 1em; font-family: Arial, sans-serif; }
         .input-komentar:focus { outline: none; border-color: #4a2c18; box-shadow: 0 0 0 2px rgba(74,44,24,0.15); }
         .error-msg { color: #c0392b; font-size: 12px; margin-top: 6px; display: none; }
-
         .total-ulasan { font-size: 1.5em; font-weight: bold; color: #333; margin-bottom: 25px; }
-
         .ulasan-item { display: flex; padding: 15px 0; border-bottom: 1px solid #eee; animation: fadeIn 0.3s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
         .ulasan-avatar { width: 45px; height: 45px; border-radius: 50%; margin-right: 15px; flex-shrink: 0; background-color: #ddd; object-fit: cover; }
         .ulasan-konten { flex-grow: 1; }
         .ulasan-header { display: flex; align-items: center; margin-bottom: 5px; gap: 8px; flex-wrap: wrap; }
         .ulasan-nama { font-weight: bold; color: #333; }
-        .ulasan-rating { font-size: 1em; display: flex; }
         .ulasan-rating .star-filled { color: #ffc107; }
         .ulasan-rating .star-empty { color: #aaa; }
         .ulasan-teks { font-size: 0.9em; color: #555; line-height: 1.4; }
         .ulasan-tanggal { font-size: 0.75em; color: #aaa; margin-left: auto; }
         .ulasan-item:last-child { border-bottom: none; }
         .tag-saya { font-size: 11px; background: #4a2c18; color: #fff; padding: 2px 8px; border-radius: 20px; }
-
         .kosong-ulasan { text-align: center; padding: 40px 0; color: #aaa; }
         .kosong-ulasan i { font-size: 36px; margin-bottom: 10px; display: block; }
-
-        .no-artikel {
-            background: #f5ede8; border-radius: 10px; padding: 40px;
-            text-align: center; color: #4a2c18;
-        }
+        .no-artikel { background: #f5ede8; border-radius: 10px; padding: 40px; text-align: center; color: #4a2c18; }
         .no-artikel i { font-size: 40px; margin-bottom: 12px; display: block; opacity: 0.5; }
-
-        .toast {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background-color: #4a2c18; color: #fff;
-            padding: 10px 22px; border-radius: 30px;
-            font-size: 0.9em; font-weight: bold;
-            opacity: 0; transition: opacity 0.3s, transform 0.3s;
-            z-index: 9999; pointer-events: none;
-        }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(20px); background-color: #4a2c18; color: #fff; padding: 10px 22px; border-radius: 30px; font-size: 0.9em; font-weight: bold; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 9999; pointer-events: none; }
         .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        /* FOOTER */
         .footer { background-color: #4a2c18; color: #fff; padding: 40px 20px; font-size: 14px; }
         .footer-container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.2fr 2.5fr 1fr; gap: 20px; align-items: flex-start; }
         .footer-kolom { padding: 0 10px; }
@@ -201,19 +138,13 @@ if (count($ulasan_list) > 0) {
         .middle-section { display: flex; flex-direction: column; }
         .navigasi-horizontal { display: flex; justify-content: space-between; margin-bottom: 30px; flex-wrap: wrap; color: white; }
         .navigasi-horizontal a { color: inherit; text-decoration: none; font-weight: bold; font-size: 16px; padding-right: 20px; }
-        .middle-section h4 { color: white; margin-top: 0; margin-bottom: 10px; font-weight: bold; font-size: 16px; }
+        .middle-section h4 { color: white; margin-top: 0; margin-bottom: 10px; font-size: 16px; }
         .kontak .item-kontak { margin-bottom: 15px; }
         .kontak .item-kontak p { margin: 2px 0; }
-        .kontak .item-kontak p:first-child { font-weight: bold; margin-bottom: 2px; color: white; display: flex; align-items: center; }
-        .kontak .item-kontak i { margin-right: 8px; font-size: 18px; color: #fff; }
+        .kontak .item-kontak p:first-child { font-weight: bold; color: white; display: flex; align-items: center; }
+        .kontak .item-kontak i { margin-right: 8px; font-size: 18px; }
         a { text-decoration: none; }
-
-        @media (max-width: 768px) {
-            .footer-container { grid-template-columns: 1fr; gap: 30px; }
-            .main-content-section { flex-direction: column; padding: 20px; gap: 20px; }
-            .kartu-artikel { width: 100%; }
-            .container-ulasan { max-width: 100%; }
-        }
+        @media (max-width: 768px) { .footer-container { grid-template-columns: 1fr; gap: 30px; } .main-content-section { flex-direction: column; padding: 20px; gap: 20px; } .kartu-artikel { width: 100%; } .container-ulasan { max-width: 100%; } }
     </style>
 </head>
 <body>
@@ -228,7 +159,16 @@ if (count($ulasan_list) > 0) {
     <div class="kartu-artikel">
         <?php if ($artikel_data): ?>
             <?php
-                $thumb = $artikel_data['thumbnail'] ?? '';
+                $thumb = '';
+                if (!empty($artikel_data['thumbnail'])) {
+                    if (file_exists(__DIR__ . '/uploads/' . $artikel_data['thumbnail'])) {
+                        $thumb = 'uploads/' . $artikel_data['thumbnail'];
+                    } else {
+                        $thumb = $artikel_data['thumbnail'];
+                    }
+                } else {
+                    $thumb = 'cover1.jpg';
+                }
                 $bintang_str = str_repeat('★', $rata_rating) . str_repeat('☆', 5 - $rata_rating);
             ?>
             <div class="area-gambar">
@@ -237,7 +177,7 @@ if (count($ulasan_list) > 0) {
             </div>
             <h3 class="judul-artikel"><?= htmlspecialchars($artikel_data['judul']) ?></h3>
             <div class="rating-bintang"><?= $bintang_str ?></div>
-            <a href="isi.php?slug=<?= urlencode($artikel_data['slug']) ?>" class="tombol-baca">
+            <a href="detail_artikel.php?slug=<?= urlencode($artikel_data['slug']) ?>&baca=1" class="tombol-baca">
                 Baca Sekarang
                 <img src="majesticons_arrow-right.png" alt="Panah" class="ikon-panah" onerror="this.style.display='none'">
             </a>
@@ -291,7 +231,7 @@ if (count($ulasan_list) > 0) {
 
         <hr>
 
-        <div class="total-ulasan">Ulasan <?= count($ulasan_list) ?></div>
+        <div class="total-ulasan">Ulasan (<?= count($ulasan_list) ?>)</div>
 
         <div class="daftar-ulasan" id="daftar-ulasan">
             <?php if (count($ulasan_list) === 0): ?>
@@ -323,7 +263,7 @@ if (count($ulasan_list) > 0) {
                                 <span class="ulasan-nama">@<?= htmlspecialchars($u['username']) ?></span>
                                 <span class="ulasan-rating">
                                     <span class="star-filled"><?= $filled ?></span>
-                                    <span class="star-empty" style="color:#aaa"><?= $empty ?></span>
+                                    <span class="star-empty"><?= $empty ?></span>
                                 </span>
                                 <?php if ($is_saya): ?>
                                     <span class="tag-saya">Ulasan Anda</span>
@@ -359,7 +299,7 @@ if (count($ulasan_list) > 0) {
         <div class="footer-kolom middle-section">
             <div class="navigasi-horizontal">
                 <a href="landingpagepilihanfix.php">Beranda</a>
-                <a href="#">Artikel</a>
+                <a href="viewmore.php">Artikel</a>
                 <a href="favorit.php">Favorit</a>
                 <a href="rating.php">Ulasan</a>
             </div>
@@ -388,51 +328,109 @@ if (count($ulasan_list) > 0) {
     const USER_ID     = <?= $user_id ?>;
     let ratingDipilih = 0;
 
+    // ── Bintang rating ──
+    const stars = document.querySelectorAll('#rating-input .star');
+
+    function updateBintang(nilai) {
+        stars.forEach(function(s) {
+            const n = parseInt(s.getAttribute('data-nilai'));
+            if (n <= nilai) {
+                s.classList.add('aktif');
+                s.classList.remove('hover');
+            } else {
+                s.classList.remove('aktif');
+                s.classList.remove('hover');
+            }
+        });
+    }
+
+    stars.forEach(function(star) {
+        star.addEventListener('click', function() {
+            ratingDipilih = parseInt(this.getAttribute('data-nilai'));
+            updateBintang(ratingDipilih);
+        });
+        star.addEventListener('mouseenter', function() {
+            updateBintang(parseInt(this.getAttribute('data-nilai')));
+        });
+        star.addEventListener('mouseleave', function() {
+            updateBintang(ratingDipilih);
+        });
+    });
+
+    // mouseleave pada container untuk reset ke nilai terpilih
+    const ratingContainer = document.getElementById('rating-input');
+    if (ratingContainer) {
+        ratingContainer.addEventListener('mouseleave', function() {
+            updateBintang(ratingDipilih);
+        });
+    }
+
+    // ── Kirim ulasan ──
     async function kirimUlasan() {
-        if (ARTIKEL_ID === 0) { showToast('Pilih artikel terlebih dahulu.'); return; }
+        if (ARTIKEL_ID === 0) {
+            showToast('Pilih artikel terlebih dahulu.');
+            return;
+        }
+
         const teks  = document.getElementById('input-komentar').value.trim();
         const errEl = document.getElementById('error-msg');
         const btnEl = document.getElementById('btn-kirim');
-        if (!teks || ratingDipilih === 0) { errEl.style.display = 'block'; return; }
+
+        if (!teks || ratingDipilih === 0) {
+            errEl.style.display = 'block';
+            return;
+        }
+
         errEl.style.display = 'none';
         btnEl.disabled = true;
-        try {
-            const res  = await fetch('simpan_ulasan.php', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({artikel_id:ARTIKEL_ID,rating:ratingDipilih,komentar:teks}) });
-            const json = await res.json();
-            if (!json.sukses) { showToast('Gagal: '+json.pesan); btnEl.disabled=false; return; }
-            showToast('Ulasan berhasil dikirim!');
-            setTimeout(()=>location.reload(), 1200);
-        } catch(err) { showToast('Terjadi kesalahan jaringan.'); btnEl.disabled=false; }
-    }
 
-    function updateBintang(nilai) {
-        document.querySelectorAll('#rating-input .star').forEach(s => s.classList.toggle('aktif', parseInt(s.dataset.nilai) <= nilai));
+        try {
+            const res = await fetch('simpan_ulasan.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    artikel_id: ARTIKEL_ID,
+                    rating:     ratingDipilih,
+                    komentar:   teks
+                })
+            });
+
+            const text = await res.text();
+            console.log('Raw response simpan_ulasan:', text);
+
+            let json;
+            try {
+                json = JSON.parse(text);
+            } catch(e) {
+                showToast('Terjadi kesalahan server.');
+                console.error('Response bukan JSON:', text);
+                btnEl.disabled = false;
+                return;
+            }
+
+            if (json.sukses) {
+                showToast('✓ Ulasan berhasil dikirim!');
+                setTimeout(function(){ location.reload(); }, 1200);
+            } else {
+                showToast('Gagal: ' + (json.pesan || 'Terjadi kesalahan'));
+                console.error('Error simpan ulasan:', json);
+                btnEl.disabled = false;
+            }
+
+        } catch(err) {
+            showToast('Terjadi kesalahan jaringan.');
+            console.error('Fetch error:', err);
+            btnEl.disabled = false;
+        }
     }
-    document.querySelectorAll('#rating-input .star').forEach(star => {
-        star.addEventListener('click', function() { ratingDipilih=parseInt(this.dataset.nilai); updateBintang(ratingDipilih); });
-        star.addEventListener('mouseenter', function() { updateBintang(parseInt(this.dataset.nilai)); });
-    });
-    document.getElementById('rating-input')?.addEventListener('mouseleave', ()=>updateBintang(ratingDipilih));
 
     function showToast(pesan) {
         const toast = document.getElementById('toast');
-        toast.textContent = pesan; toast.classList.add('show');
-        setTimeout(()=>toast.classList.remove('show'), 2500);
+        if (!toast) return;
+        toast.textContent = pesan;
+        toast.classList.add('show');
+        setTimeout(function(){ toast.classList.remove('show'); }, 2500);
     }
-
-    // Navbar JS (dari navbar_user.php)
-    function toggleDropdown(event) { event.preventDefault(); const m=document.getElementById('dropdown-menu'); m.style.display=(m.style.display==='block')?'none':'block'; }
-    document.addEventListener('click',function(e){const m=document.getElementById('dropdown-menu');const d=document.querySelector('.dropdown');if(d&&!d.contains(e.target))m.style.display='none';});
-    function toggleProfileDropdown(event){event.stopPropagation();document.getElementById('profile-dropdown-menu').classList.toggle('show');}
-    document.addEventListener('click',function(e){const pd=document.getElementById('profile-dropdown');const m=document.getElementById('profile-dropdown-menu');if(m&&pd&&!pd.contains(e.target))m.classList.remove('show');});
-    const sidebar=document.getElementById('sidebar');
-    const hamburgerBtn=document.getElementById('hamburger-btn');
-    const closeSidebarBtn=document.getElementById('close-sidebar-btn');
-    function openSidebar(){const w=window.innerWidth;sidebar.style.width=w<350?'90%':w<450?'300px':'250px';document.body.style.overflow='hidden';}
-    function closeSidebar(){sidebar.style.width='0';document.body.style.overflow='';const ad=document.querySelector('.dropdown-menu-sidebar[style*="display: block"]');if(ad)ad.style.display='none';}
-    function toggleDropdownSidebar(event){event.preventDefault();const dd=event.target.nextElementSibling;document.querySelectorAll('.dropdown-menu-sidebar').forEach(d=>{if(d!==dd)d.style.display='none';});dd.style.display=dd.style.display==='block'?'none':'block';}
-    hamburgerBtn.addEventListener('click',openSidebar);
-    closeSidebarBtn.addEventListener('click',closeSidebar);
 </script>
 </body>
 </html>

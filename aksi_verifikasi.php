@@ -41,12 +41,14 @@ if ($aksi === 'approve') {
 
     // Kirim notifikasi ke penulis
     if (!empty($artikel['created_by'])) {
-        $pesan_notif = "Artikel Anda berjudul '{$artikel['judul']}' telah diverifikasi dan diterbitkan.";
+        // NOTIFIKASI DENGAN FORMAT ID ARTIKEL
+        $pesan_notif = "ID: {$artikel['id']} - Artikel Anda berjudul '{$artikel['judul']}' telah diverifikasi dan diterbitkan.";
+        $judul_notif = "Artikel Disetujui";
         $notif = $conn->prepare(
-            "INSERT INTO tb_notifikasi (user_id, pesan, tipe, created_at) VALUES (?, ?, 'artikel_approved', NOW())"
+            "INSERT INTO tb_notifikasi (user_id, judul, pesan, tipe, created_at) VALUES (?, ?, ?, 'info', NOW())"
         );
         if ($notif) {
-            $notif->bind_param("is", $artikel['created_by'], $pesan_notif);
+            $notif->bind_param("iss", $artikel['created_by'], $judul_notif, $pesan_notif);
             $notif->execute();
         }
     }
@@ -81,12 +83,14 @@ if ($aksi === 'approve') {
 
     // Kirim notifikasi ke penulis
     if (!empty($artikel['created_by'])) {
-        $pesan_notif = "Artikel Anda berjudul '{$artikel['judul']}' ditolak. Catatan admin: {$catatan}";
+        // NOTIFIKASI DENGAN FORMAT ID ARTIKEL (PENTING!)
+        $pesan_notif = "ID: {$artikel['id']} - Artikel Anda berjudul '{$artikel['judul']}' ditolak. Catatan admin: {$catatan}";
+        $judul_notif = "Artikel Ditolak";
         $notif = $conn->prepare(
-            "INSERT INTO tb_notifikasi (user_id, pesan, tipe, created_at) VALUES (?, ?, 'artikel_rejected', NOW())"
+            "INSERT INTO tb_notifikasi (user_id, judul, pesan, tipe, created_at) VALUES (?, ?, ?, 'peringatan', NOW())"
         );
         if ($notif) {
-            $notif->bind_param("is", $artikel['created_by'], $pesan_notif);
+            $notif->bind_param("iss", $artikel['created_by'], $judul_notif, $pesan_notif);
             $notif->execute();
         }
     }
@@ -104,3 +108,4 @@ if ($aksi === 'approve') {
 // Fallback
 header("Location: dashboardAdmin.php?page=verifikasi");
 exit();
+?>

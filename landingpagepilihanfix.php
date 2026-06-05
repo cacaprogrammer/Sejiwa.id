@@ -1,23 +1,18 @@
 <?php
 session_start();
-
-if (!isset($_SESSION['username'])) {
-    header("Location: loginpage.php");
-    exit();
-}
-
-if ($_SESSION['role'] === 'admin') {
-    header("Location: dashboardAdmin.php");
-    exit();
-}
-
 require_once 'koneksi.php';
 
-// Hitung notif belum dibaca
-$_nb_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM tb_notifikasi WHERE user_id = ? AND dibaca = 0");
-$_nb_stmt->bind_param("i", $_SESSION['id']);
-$_nb_stmt->execute();
-$_nb_count = $_nb_stmt->get_result()->fetch_assoc()['total'];
+// Tidak ada redirect ke login — guest bisa mengakses halaman ini
+$isLoggedIn = isset($_SESSION['username']);
+
+// Hitung notifikasi hanya jika user login (untuk ditampilkan di navbar)
+$_nb_count = 0;
+if ($isLoggedIn) {
+    $_nb_stmt = $conn->prepare("SELECT COUNT(*) AS total FROM tb_notifikasi WHERE user_id = ? AND dibaca = 0");
+    $_nb_stmt->bind_param("i", $_SESSION['id']);
+    $_nb_stmt->execute();
+    $_nb_count = $_nb_stmt->get_result()->fetch_assoc()['total'];
+}
 
 // Ambil 5 artikel Sejarah
 $q_sejarah = $conn->query("
@@ -56,6 +51,11 @@ function renderBintang($nilai) {
     for ($i = 0; $i < $kosong; $i++) $html .= '<span class="unfilled-star">★</span>';
     return $html;
 }
+
+// PERBAIKAN: Hapus fungsi guardLink, semua link langsung bisa diakses
+// function guardLink($url, $isLoggedIn) {
+//     return $isLoggedIn ? $url : 'loginpage.php';
+// }
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -67,92 +67,6 @@ function renderBintang($nilai) {
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; line-height: 1.6; background-color: #f7f7f7; }
-
-        /* ── NAVBAR ── */
-        header {
-            height: 50px; background-color: #4a2c18; color: #f7f7f7;
-            padding: 0 15px; display: flex; justify-content: space-between;
-            align-items: center; position: sticky; top: 0; left: 0; width: 100%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 1000;
-        }
-        .logo { display: flex; align-items: center; }
-        .logo-img { height: 40px; width: auto; }
-        .logo-text-img { height: 70px; width: auto; margin-left: -12px; position: relative; top: -2px; }
-
-        .dropdown { position: relative; }
-        .dropdown-menu {
-            position: absolute; top: calc(100% + 14px); left: -10px;
-            background: #fff; border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
-            min-width: 190px; padding: 8px 0; display: none;
-            border: 1px solid #f0e6de; z-index: 2000;
-        }
-        .dropdown-menu::before {
-            content: ''; position: absolute; top: -8px; left: 24px;
-            width: 16px; height: 16px; background: #fff;
-            border-left: 1px solid #f0e6de; border-top: 1px solid #f0e6de;
-            transform: rotate(45deg);
-        }
-        .dropdown-menu .ddm-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 16px; color: #333; font-size: 14px;
-            font-weight: 500; text-decoration: none; transition: background .15s;
-        }
-        .dropdown-menu .ddm-item:hover { background: #fdf5f0; color: #4a2c18; }
-        .dropdown-menu .ddm-item i { width: 18px; text-align: center; color: #a3826f; font-size: 15px; }
-        .dropdown-menu .ddm-separator { height: 0.5px; background: #f3e8e0; margin: 4px 8px; }
-
-        nav ul { display: flex; list-style: none; padding: 0; }
-        nav ul li { margin-left: 20px; }
-        nav ul li a { text-decoration: none; color: inherit; font-size: 0.95em; font-weight: bold; transition: 0.3s; }
-        nav ul li a:hover { color: #a3826f; }
-
-        .hamburger-menu { display: none; background: none; border: none; color: #f7f7f7; font-size: 1.5em; cursor: pointer; padding: 5px; margin-right: 10px; }
-        .sidebar { height: 100%; width: 0; position: fixed; z-index: 1001; top: 0; right: 0; background-color: #4a2c18; overflow-x: hidden; transition: 0.3s; padding-top: 60px; box-shadow: -5px 0 15px rgba(0,0,0,0.4); }
-        .sidebar a { padding: 15px 25px; text-decoration: none; font-size: 18px; color: #f7f7f7; display: block; transition: 0.3s; }
-        .sidebar a:hover { background-color: #6d4c41; }
-        .sidebar .close-btn { position: absolute; top: 0; right: 15px; font-size: 36px; margin-left: 50px; color: #f7f7f7; border: none; background: none; cursor: pointer; }
-        .sidebar-user-icon { padding: 20px 25px; border-bottom: 1px solid #6d4c41; margin-bottom: 10px; }
-        .sidebar-user-icon a { font-size: 20px; font-weight: bold; }
-        .sidebar-user-icon i { margin-right: 10px; }
-        .dropdown-menu-sidebar { display: none; background-color: #724636; padding: 5px 0; }
-        .dropdown-menu-sidebar .dropdown-inner { background: #fff; border-radius: 8px; border: 2px solid #724636; padding: 2px 0; margin: 5px 15px; }
-        .dropdown-menu-sidebar .dropdown-inner a { color: #000; padding: 5px 10px; font-size: 14px; text-align: center; }
-        .dropdown-menu-sidebar .dropdown-separator { height: 5px; background: #724636; margin: 0 15px; }
-
-        .profile-dropdown { position: relative; }
-        .profile-dropdown-trigger { display: flex; align-items: center; cursor: pointer; color: #fff; margin-right: 15px; background: none; border: none; padding: 0; }
-        .profile-dropdown-trigger i { font-size: 1.6em; }
-        .profile-dropdown-trigger:hover i { color: #a3826f; }
-        .profile-dropdown-menu {
-            position: absolute; top: calc(100% + 14px); right: 0;
-            background: #fff; border-radius: 12px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.18);
-            min-width: 215px; padding: 8px 0; display: none; z-index: 2000;
-            border: 1px solid #f0e6de;
-        }
-        .profile-dropdown-menu.show { display: block; }
-        .profile-dropdown-menu::before {
-            content: ''; position: absolute; top: -8px; right: 18px;
-            width: 16px; height: 16px; background: #fff;
-            border-left: 1px solid #f0e6de; border-top: 1px solid #f0e6de;
-            transform: rotate(45deg);
-        }
-        .pdm-user { padding: 12px 18px 10px; border-bottom: 1px solid #f3e8e0; margin-bottom: 4px; }
-        .pdm-user-name { font-size: 14px; font-weight: 700; color: #2d1a0e; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 170px; }
-        .pdm-user-role { font-size: 11px; color: #a3826f; margin-top: 1px; }
-        .pdm-item { display: flex; align-items: center; gap: 12px; padding: 10px 18px; color: #333; font-size: 14px; font-weight: 500; text-decoration: none; transition: background .15s; }
-        .pdm-item:hover { background: #fdf5f0; color: #4a2c18; }
-        .pdm-item i { width: 18px; text-align: center; color: #a3826f; font-size: 15px; }
-        .pdm-item.logout { border-top: 1px solid #f3e8e0; margin-top: 4px; color: #c0392b; }
-        .pdm-item.logout i { color: #c0392b; }
-        .pdm-item.logout:hover { background: #fff5f5; }
-        .pdm-notif-badge { margin-left: auto; background: #ef4444; color: #fff; font-size: 11px; font-weight: 700; min-width: 18px; height: 18px; border-radius: 9px; display: flex; align-items: center; justify-content: center; padding: 0 4px; }
-
-        @media (max-width: 1024px) {
-            nav, .profile-dropdown { display: none; }
-            .hamburger-menu { display: block; }
-        }
 
         /* Hero */
         .hero-section { display: flex; max-width: 1200px; margin: 20px auto; padding: 20px 50px; gap: 50px; align-items: center; }
@@ -247,6 +161,7 @@ function renderBintang($nilai) {
     <div class="hero-text">
         <h1>EXPLORE SEJARAH BANGSA INDONESIA</h1>
         <p>Explore Sejarah Indonesia, menghadirkan artikel-artikel menarik yang mengajak Anda menyelami kisah-kisah epik bangsa. Temukan peristiwa bersejarah dan tokoh penting yang membentuk Indonesia seperti yang kita kenal hari ini.</p>
+        <!-- PERBAIKAN: Link viewmore.php langsung bisa diakses guest -->
         <a href="viewmore.php"><button class="hero-button">Lihat Lebih Banyak</button></a>
     </div>
     <div class="image-container">
@@ -347,7 +262,8 @@ function renderBintang($nilai) {
         <div class="footer-kolom middle-section">
             <div class="navigasi-horizontal">
                 <a href="landingpagepilihanfix.php">Beranda</a>
-                <a href="daftarsearchSejarah.php">Artikel</a>
+                <a href="viewmore.php">Artikel</a>
+                <!-- PERBAIKAN: Hapus guardLink, langsung arahkan ke halaman favorit/rating -->
                 <a href="favorit.php">Favorit</a>
                 <a href="rating.php">Ulasan</a>
             </div>
@@ -372,50 +288,22 @@ function renderBintang($nilai) {
 </div>
 
 <script>
-    function toggleDropdown(event) {
-        event.preventDefault();
-        const menu = document.getElementById('dropdown-menu');
-        menu.style.display = (menu.style.display === 'block') ? 'none' : 'block';
-    }
-    document.addEventListener('click', function(e) {
-        const menu = document.getElementById('dropdown-menu');
-        const dd   = document.querySelector('.dropdown');
-        if (dd && !dd.contains(e.target)) menu.style.display = 'none';
-    });
-
-    const sidebar         = document.getElementById('sidebar');
-    const hamburgerBtn    = document.getElementById('hamburger-btn');
+    // Sidebar (dari navbar_user akan menangani, tapi ini untuk keamanan)
+    const sidebar = document.getElementById('sidebar');
+    const hamburgerBtn = document.getElementById('hamburger-btn');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
     function openSidebar() {
-        const w = window.innerWidth;
-        sidebar.style.width = w < 350 ? '90%' : w < 450 ? '300px' : '250px';
+        if(sidebar) sidebar.style.width = window.innerWidth < 350 ? '90%' : (window.innerWidth < 450 ? '300px' : '250px');
         document.body.style.overflow = 'hidden';
     }
     function closeSidebar() {
-        sidebar.style.width = '0';
+        if(sidebar) sidebar.style.width = '0';
         document.body.style.overflow = '';
         const ad = document.querySelector('.dropdown-menu-sidebar[style*="display: block"]');
-        if (ad) ad.style.display = 'none';
+        if(ad) ad.style.display = 'none';
     }
-    function toggleDropdownSidebar(event) {
-        event.preventDefault();
-        const dd  = event.target.nextElementSibling;
-        const all = document.querySelectorAll('.dropdown-menu-sidebar');
-        all.forEach(d => { if (d !== dd) d.style.display = 'none'; });
-        dd.style.display = dd.style.display === 'block' ? 'none' : 'block';
-    }
-    hamburgerBtn.addEventListener('click', openSidebar);
-    closeSidebarBtn.addEventListener('click', closeSidebar);
-
-    function toggleProfileDropdown(event) {
-        event.stopPropagation();
-        document.getElementById('profile-dropdown-menu').classList.toggle('show');
-    }
-    document.addEventListener('click', function(e) {
-        const pd   = document.getElementById('profile-dropdown');
-        const menu = document.getElementById('profile-dropdown-menu');
-        if (menu && pd && !pd.contains(e.target)) menu.classList.remove('show');
-    });
+    if(hamburgerBtn) hamburgerBtn.addEventListener('click', openSidebar);
+    if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
 </script>
 </body>
 </html>

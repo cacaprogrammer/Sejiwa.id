@@ -73,7 +73,7 @@ if (isset($_POST['aksi']) && $_POST['aksi'] === 'edit') {
             $pesan = 'Nama kategori sudah digunakan oleh kategori lain.';
             $tipe  = 'error';
         } else {
-            // Update juga kolom kategori di tb_artikel supaya sinkron
+            // Update kategori
             $upd = $conn->prepare("UPDATE tb_kategori SET nama_kategori = ?, slug_kategori = ? WHERE id_kategori = ?");
             $upd->bind_param("ssi", $nama, $slug, $id);
             if ($upd->execute()) {

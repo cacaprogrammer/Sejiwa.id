@@ -68,6 +68,12 @@ if ($foto && file_exists("uploads/" . $foto)) {
 } else {
     $foto_src = "https://i.pravatar.cc/160";
 }
+
+// Notifikasi unread count
+$stmt_unread = $conn->prepare("SELECT COUNT(*) AS total FROM tb_notifikasi WHERE user_id = ? AND dibaca = 0");
+$stmt_unread->bind_param("i", $_SESSION['id']);
+$stmt_unread->execute();
+$unread_count = $stmt_unread->get_result()->fetch_assoc()['total'];
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -81,87 +87,86 @@ if ($foto && file_exists("uploads/" . $foto)) {
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
 
-    html, body { height: 100%; }
-    body {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background: #ffffff;
-      overflow-x: hidden;
-    }
+    html, body { height: 100%; background: #f4f1ee; overflow-x: hidden; }
 
+    /* ───── SIDEBAR ───── */
     .sidebar {
       position: fixed;
       top: 0; left: 0;
       width: 240px;
       height: 100vh;
       background: #4a2c18;
-      padding: 30px 25px;
-      color: white;
+      padding: 28px 20px 28px;
+      color: #fff;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      transition: transform 0.35s ease-in-out;
       z-index: 1000;
+      transition: transform .35s ease-in-out;
+      overflow-y: auto;
     }
-
-    .sidebar-logo { width: 55px; margin-bottom: 50px; }
-
+    .sidebar-logo { width: 52px; margin-bottom: 36px; }
+    .sidebar-nav-label {
+      font-size: 10px; font-weight: 700; letter-spacing: .08em;
+      color: rgba(255,255,255,.45); text-transform: uppercase;
+      padding: 0 6px; margin: 8px 0 4px;
+    }
     .sidebar a {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 15px;
-      font-size: 16px;
-      color: white;
-      text-decoration: none;
-      padding: 14px 5px;
-      margin: 2px 0;
-      border-radius: 10px;
+      width: 100%; display: flex; align-items: center; gap: 12px;
+      font-size: 14.5px; color: rgba(255,255,255,.85); text-decoration: none;
+      padding: 11px 12px; margin: 2px 0; border-radius: 10px;
+      position: relative; transition: background .15s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar a.active {
+      background: rgba(255,255,255,.16);
+      color: #fff; border-left-color: #f0c080; font-weight: 600;
+    }
+    .sidebar a:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .sidebar a i { width: 18px; text-align: center; font-size: 15px; flex-shrink: 0; }
+
+    .notif-badge {
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      background: #ef4444; color: #fff; font-size: 10px; font-weight: 700;
+      min-width: 18px; height: 18px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center; padding: 0 4px;
     }
 
-    .icon-menu { width: 20px; height: 20px; object-fit: contain; margin-right: 14px; }
-    .sidebar a.active { background: rgba(255,255,255,0.15); }
-    .sidebar a:hover  { background: rgba(255,255,255,0.12); }
-
+    /* ───── HAMBURGER ───── */
     .hamburger {
-      display: none;
-      position: fixed;
-      top: 32px; right: 26px;
-      font-size: 28px;
-      color: #4a2c18;
-      cursor: pointer;
-      z-index: 1100;
+      display: none; position: fixed; top: 14px; right: 18px;
+      font-size: 22px; color: #4a2c18; cursor: pointer; z-index: 1100;
+      background: #fff; width: 38px; height: 38px; border-radius: 8px;
+      align-items: center; justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
     }
 
+    /* ───── MAIN ───── */
     .main-wrapper {
-      margin-left: 230px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      transition: margin-left 0.35s ease;
+      margin-left: 240px;
+      min-height: 100vh;
+      width: calc(100% - 240px);
+      padding: 32px 40px;
     }
 
-    .content { padding: 30px 40px; }
-
-    .profile-header {
-      background: #fff;
-      padding: 18px 22px;
-      border-radius: 10px;
-      box-shadow: 0 0 7px rgba(0,0,0,0.12);
-      margin-bottom: 30px;
+    /* ───── PAGE HEADER ───── */
+    .page-header {
+      background: #fff; padding: 16px 22px; border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0,0,0,.08); margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .profile-header h3 { font-size: 19px; color: #333; font-weight: 600; }
+    .page-header h3 { font-size: 18px; font-weight: 700; color: #2d1a0e; }
 
+    /* ───── FORM ───── */
     .edit-container {
       background: #fff;
       padding: 30px 35px;
-      border-radius: 12px;
+      border-radius: 14px;
       max-width: 720px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+      box-shadow: 0 1px 8px rgba(0,0,0,.09);
       margin-bottom: 40px;
     }
-    .edit-title { font-size: 20px; margin-bottom: 18px; color: #333; font-weight: 600; }
+    .edit-title { font-size: 17px; font-weight: 700; color: #2d1a0e; margin-bottom: 18px; }
 
     .form-group { margin-bottom: 14px; }
     label { display: block; font-size: 14px; margin-bottom: 6px; color: #333; }
@@ -183,7 +188,7 @@ if ($foto && file_exists("uploads/" . $foto)) {
     .col { flex: 1; }
 
     .actions { display: flex; gap: 12px; justify-content: flex-end; margin-top: 18px; }
-    .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+    .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; }
     .btn-secondary { background: #fff; border: 1px solid #ccc; color: #333; }
     .btn-primary   { background: #5a2f1f; color: #fff; }
     .btn-primary:hover { background: #7a3f2f; }
@@ -196,7 +201,7 @@ if ($foto && file_exists("uploads/" . $foto)) {
     }
 
     .foto-wrap { position: relative; display: inline-block; }
-    .foto-wrap img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #ddd; }
+    .foto-wrap img { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; border: 3px solid #e8ddd5; }
     .foto-wrap label.ubah-foto {
       position: absolute; bottom: 0; right: 0;
       background: #8b3e26; color: #fff;
@@ -206,172 +211,187 @@ if ($foto && file_exists("uploads/" . $foto)) {
     }
     #input-foto { display: none; }
 
+    /* ───── RESPONSIVE ───── */
     @media (max-width: 900px) {
-      .hamburger { display: block; }
-      .sidebar { transform: translateX(-100%); position: fixed; width: 240px; }
+      .hamburger { display: flex; }
+      .sidebar { transform: translateX(-100%); }
       .sidebar.show { transform: translateX(0); }
-      .main-wrapper { margin-left: 0; }
-      .content { margin-left: 0; padding: 20px; }
+      .main-wrapper { margin-left: 0; width: 100%; padding: 20px 16px; padding-top: 60px; }
       .row { flex-direction: column; gap: 0; }
     }
   </style>
 </head>
 <body>
 
-  <div class="hamburger" id="hamburger">
-    <i class="fas fa-bars"></i>
+<div class="hamburger" id="hamburger"><i class="fas fa-bars"></i></div>
+
+<!-- ═══ SIDEBAR ═══ -->
+<div class="sidebar" id="sidebar">
+  <img src="logobenar.png" class="sidebar-logo" alt="Logo">
+
+  <div class="sidebar-nav-label">Menu</div>
+
+  <a href="history.php?tab=profil">
+    <i class="fas fa-user"></i> Profil &amp; Riwayat
+  </a>
+
+  <a href="history.php?tab=artikel">
+    <i class="fas fa-pen-to-square"></i> Kelola Artikel
+  </a>
+
+  <a href="history.php?tab=notifikasi">
+    <i class="fas fa-bell"></i> Notifikasi
+    <?php if ($unread_count > 0): ?>
+      <span class="notif-badge"><?= $unread_count > 99 ? '99+' : $unread_count ?></span>
+    <?php endif; ?>
+  </a>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main-wrapper">
+
+  <div class="page-header">
+    <h3><i class="fas fa-user-pen" style="color:#8b3e26;margin-right:8px"></i>Edit Profil</h3>
   </div>
 
-  <div class="sidebar" id="sidebar">
-    <img src="logobenar.png" class="sidebar-logo">
-    <a href="history.php">
-      <img src="iconamoon_profile.png" class="icon-menu"> Profil
-    </a>
-    <a href="logout.php">
-      <img src="Group.png" class="icon-menu"> Keluar
-    </a>
-  </div>
+  <section class="edit-container" aria-label="form ubah profil">
+    <div class="edit-title">Ubah Informasi Akun</div>
 
-  <div class="main-wrapper">
-    <main class="content">
-      <div class="profile-header">
-        <h3>Edit Profile</h3>
+    <?php if ($pesan !== ""): ?>
+      <div class="pesan-error"><?= htmlspecialchars($pesan) ?></div>
+    <?php endif; ?>
+
+    <form method="post" action="" enctype="multipart/form-data">
+
+      <div style="display:flex; align-items:center; gap:18px; margin-bottom:20px;">
+        <div class="foto-wrap">
+          <img src="<?= htmlspecialchars($foto_src) ?>" alt="foto profil" id="preview-foto" onerror="this.src='https://i.pravatar.cc/160'">
+          <label class="ubah-foto" for="input-foto" title="Ganti foto">
+            <i class="fas fa-camera"></i>
+          </label>
+          <input type="file" name="foto" id="input-foto" accept="image/*">
+        </div>
+        <div>
+          <div style="font-weight:700; font-size:17px; color:#2d1a0e;">
+            <?= htmlspecialchars($user['nama_lengkap']) ?>
+          </div>
+          <div style="color:#888; font-size:13px; margin-top:5px;">
+            @<?= htmlspecialchars($user['username']) ?>
+          </div>
+        </div>
       </div>
 
-      <section class="edit-container" aria-label="form ubah profil">
-        <div class="edit-title">Edit Profil</div>
+      <div class="form-group">
+        <label>Nama Lengkap</label>
+        <input type="text" name="nama_lengkap" value="<?= htmlspecialchars($user['nama_lengkap']) ?>" required>
+      </div>
 
-        <?php if ($pesan !== ""): ?>
-          <div class="pesan-error"><?= htmlspecialchars($pesan) ?></div>
-        <?php endif; ?>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
+      </div>
 
-        <form method="post" action="" enctype="multipart/form-data">
+      <div class="form-group">
+        <label>Kata Sandi Baru <span style="color:#999; font-size:12px;">(kosongkan jika tidak ingin ganti)</span></label>
+        <input type="password" name="password_baru" placeholder="Masukkan kata sandi baru">
+      </div>
 
-          <div style="display:flex; align-items:center; gap:18px; margin-bottom:18px;">
-            <div class="foto-wrap">
-              <img src="<?= htmlspecialchars($foto_src) ?>" alt="foto profil" id="preview-foto" onerror="this.src='https://i.pravatar.cc/160'">
-              <label class="ubah-foto" for="input-foto" title="Ganti foto">
-                <i class="fas fa-camera"></i>
-              </label>
-              <input type="file" name="foto" id="input-foto" accept="image/*">
-            </div>
-            <div>
-              <div style="font-weight:700; font-size:18px; color:#333;">
-                <?= htmlspecialchars($user['nama_lengkap']) ?>
-              </div>
-              <div style="color:#666; margin-top:6px;">
-                @<?= htmlspecialchars($user['username']) ?>
-              </div>
-            </div>
-          </div>
+      <div class="row" style="margin-top:8px;">
+        <div class="col form-group">
+          <label>Negara</label>
+          <select name="negara" id="select-negara" onchange="updateKota()">
+            <?php
+            $negara_list = ["Indonesia","Malaysia","Singapura","Brunei Darussalam","Thailand","Filipina","Vietnam","Myanmar","Laos","Kamboja","Timor Leste","Australia","Jepang","Korea Selatan","China","India","Amerika Serikat","Inggris","Belanda","Jerman","Prancis","Lainnya"];
+            $negara_user = $user['negara'] ?? 'Indonesia';
+            foreach ($negara_list as $n) {
+                $sel = ($negara_user === $n) ? 'selected' : '';
+                echo "<option value=\"$n\" $sel>$n</option>";
+            }
+            ?>
+          </select>
+        </div>
+        <div class="col form-group">
+          <label>Kota</label>
+          <select name="kota" id="select-kota">
+            <?php
+            $kota_user = $user['kota'] ?? '';
+            $kota_map = [
+              "Indonesia" => ["Jakarta","Surabaya","Bandung","Medan","Semarang","Makassar","Palembang","Tangerang","Depok","Bekasi","Yogyakarta","Malang","Denpasar","Batam","Pekanbaru","Banjarmasin","Pontianak","Manado","Padang","Aceh","Bogor","Serang","Cilegon","Tasikmalaya","Cimahi","Balikpapan","Samarinda","Bandar Lampung","Jambi","Mataram","Kupang","Ambon","Jayapura","Sorong","Ternate","Kendari","Palu","Gorontalo","Bengkulu","Pangkal Pinang","Tanjung Pinang","Dumai","Binjai","Pematangsiantar","Tebing Tinggi","Padang Sidempuan","Gunungsitoli","Langsa","Lhokseumawe","Sabang","Subulussalam","Solok","Sawahlunto","Padang Panjang","Bukittinggi","Payakumbuh","Pariaman","Lubuklinggau","Pagar Alam","Prabumulih","Baturaja","Metro","Banjar","Sukabumi","Cirebon","Purwokerto","Magelang","Salatiga","Klaten","Surakarta","Kediri","Blitar","Madiun","Mojokerto","Pasuruan","Probolinggo","Batu","Jember","Banyuwangi","Situbondo","Bondowoso","Lumajang","Gresik","Lamongan","Tuban","Bojonegoro","Ngawi","Magetan","Ponorogo","Tulungagung","Trenggalek","Pacitan","Sampang","Pamekasan","Sumenep","Bangkalan","Singaraja","Gianyar","Tabanan","Negara","Selong","Bima","Dompu","Maumere","Ende","Ruteng","Waingapu","Atambua","Kefamenanu","Soe","Singkawang","Sambas","Sanggau","Sintang","Putussibau","Palangkaraya","Sampit","Muara Teweh","Kotabaru","Tanjung","Amuntai","Banjarbaru","Martapura","Nunukan","Tarakan","Bontang","Tenggarong","Sendawar","Tolitoli","Buol","Luwuk","Kolaka","Baubau","Raha","Wanggudu","Sofifi","Tidore","Tobelo","Tual","Saumlaki","Fakfak","Manokwari","Biak","Nabire","Wamena","Merauke","Timika"],
+              "Malaysia"  => ["Kuala Lumpur","Johor Bahru","Penang","Ipoh","Kota Kinabalu","Kuching","Shah Alam","Petaling Jaya"],
+              "Singapura" => ["Singapura"],
+              "Australia" => ["Sydney","Melbourne","Brisbane","Perth","Adelaide","Canberra"],
+              "Jepang"    => ["Tokyo","Osaka","Kyoto","Yokohama","Nagoya","Sapporo","Fukuoka"],
+              "China"     => ["Beijing","Shanghai","Guangzhou","Shenzhen","Chengdu","Hangzhou"],
+              "Amerika Serikat" => ["New York","Los Angeles","Chicago","Houston","Phoenix","Philadelphia","San Antonio","San Diego"],
+              "Inggris"   => ["London","Manchester","Birmingham","Leeds","Glasgow","Liverpool"],
+              "Lainnya"   => ["Lainnya"],
+            ];
+            $kota_sekarang = $kota_map[$negara_user] ?? ["Lainnya"];
+            foreach ($kota_sekarang as $k) {
+                $sel = ($kota_user === $k) ? 'selected' : '';
+                echo "<option value=\"$k\" $sel>$k</option>";
+            }
+            ?>
+          </select>
+        </div>
+      </div>
 
-          <div class="form-group">
-            <label>Nama Lengkap</label>
-            <input type="text" name="nama_lengkap" value="<?= htmlspecialchars($user['nama_lengkap']) ?>" required>
-          </div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" onclick="window.history.back()">Kembali</button>
+        <button type="submit" name="simpan" class="btn btn-primary">Simpan Perubahan</button>
+      </div>
 
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" required>
-          </div>
+    </form>
+  </section>
 
-          <div class="form-group">
-            <label>Kata Sandi Baru <span style="color:#999; font-size:12px;">(kosongkan jika tidak ingin ganti)</span></label>
-            <input type="password" name="password_baru" placeholder="Masukkan kata sandi baru">
-          </div>
+</div><!-- /main-wrapper -->
 
-          <div class="row" style="margin-top:8px;">
-            <div class="col form-group">
-              <label>Negara</label>
-              <select name="negara" id="select-negara" onchange="updateKota()">
-                <?php
-                $negara_list = ["Indonesia","Malaysia","Singapura","Brunei Darussalam","Thailand","Filipina","Vietnam","Myanmar","Laos","Kamboja","Timor Leste","Australia","Jepang","Korea Selatan","China","India","Amerika Serikat","Inggris","Belanda","Jerman","Prancis","Lainnya"];
-                $negara_user = $user['negara'] ?? 'Indonesia';
-                foreach ($negara_list as $n) {
-                    $sel = ($negara_user === $n) ? 'selected' : '';
-                    echo "<option value=\"$n\" $sel>$n</option>";
-                }
-                ?>
-              </select>
-            </div>
-            <div class="col form-group">
-              <label>Kota</label>
-              <select name="kota" id="select-kota">
-                <?php
-                $kota_user = $user['kota'] ?? '';
-                $kota_map = [
-                  "Indonesia" => ["Jakarta","Surabaya","Bandung","Medan","Semarang","Makassar","Palembang","Tangerang","Depok","Bekasi","Yogyakarta","Malang","Denpasar","Batam","Pekanbaru","Banjarmasin","Pontianak","Manado","Padang","Aceh","Bogor","Serang","Cilegon","Tasikmalaya","Cimahi","Balikpapan","Samarinda","Bandar Lampung","Jambi","Mataram","Kupang","Ambon","Jayapura","Sorong","Ternate","Kendari","Palu","Gorontalo","Bengkulu","Pangkal Pinang","Tanjung Pinang","Dumai","Binjai","Pematangsiantar","Tebing Tinggi","Padang Sidempuan","Gunungsitoli","Langsa","Lhokseumawe","Sabang","Subulussalam","Solok","Sawahlunto","Padang Panjang","Bukittinggi","Payakumbuh","Pariaman","Lubuklinggau","Pagar Alam","Prabumulih","Baturaja","Metro","Banjar","Sukabumi","Cirebon","Purwokerto","Magelang","Salatiga","Klaten","Surakarta","Kediri","Blitar","Madiun","Mojokerto","Pasuruan","Probolinggo","Batu","Jember","Banyuwangi","Situbondo","Bondowoso","Lumajang","Gresik","Lamongan","Tuban","Bojonegoro","Ngawi","Magetan","Ponorogo","Tulungagung","Trenggalek","Pacitan","Sampang","Pamekasan","Sumenep","Bangkalan","Singaraja","Gianyar","Tabanan","Negara","Selong","Bima","Dompu","Maumere","Ende","Ruteng","Waingapu","Atambua","Kefamenanu","Soe","Singkawang","Sambas","Sanggau","Sintang","Putussibau","Palangkaraya","Sampit","Muara Teweh","Kotabaru","Tanjung","Amuntai","Banjarbaru","Martapura","Nunukan","Tarakan","Bontang","Tenggarong","Sendawar","Tolitoli","Buol","Luwuk","Kolaka","Baubau","Raha","Wanggudu","Sofifi","Tidore","Tobelo","Tual","Saumlaki","Fakfak","Manokwari","Biak","Nabire","Wamena","Merauke","Timika"],
-                  "Malaysia"  => ["Kuala Lumpur","Johor Bahru","Penang","Ipoh","Kota Kinabalu","Kuching","Shah Alam","Petaling Jaya"],
-                  "Singapura" => ["Singapura"],
-                  "Australia" => ["Sydney","Melbourne","Brisbane","Perth","Adelaide","Canberra"],
-                  "Jepang"    => ["Tokyo","Osaka","Kyoto","Yokohama","Nagoya","Sapporo","Fukuoka"],
-                  "China"     => ["Beijing","Shanghai","Guangzhou","Shenzhen","Chengdu","Hangzhou"],
-                  "Amerika Serikat" => ["New York","Los Angeles","Chicago","Houston","Phoenix","Philadelphia","San Antonio","San Diego"],
-                  "Inggris"   => ["London","Manchester","Birmingham","Leeds","Glasgow","Liverpool"],
-                  "Lainnya"   => ["Lainnya"],
-                ];
-                $kota_sekarang = $kota_map[$negara_user] ?? ["Lainnya"];
-                foreach ($kota_sekarang as $k) {
-                    $sel = ($kota_user === $k) ? 'selected' : '';
-                    echo "<option value=\"$k\" $sel>$k</option>";
-                }
-                ?>
-              </select>
-            </div>
-          </div>
-
-          <div class="actions">
-            <button type="button" class="btn btn-secondary" onclick="window.history.back()">Kembali</button>
-            <button type="submit" name="simpan" class="btn btn-primary">Simpan Perubahan</button>
-          </div>
-
-        </form>
-      </section>
-    </main>
-  </div>
-
-  <script>
-    const hamburger = document.getElementById("hamburger");
-    const sidebar   = document.getElementById("sidebar");
-    hamburger.addEventListener("click", () => {
-      sidebar.classList.toggle("show");
-    });
-
-    const kotaMap = {
-      "Indonesia": ["Jakarta","Surabaya","Bandung","Medan","Semarang","Makassar","Palembang","Tangerang","Depok","Bekasi","Yogyakarta","Malang","Denpasar","Batam","Pekanbaru","Banjarmasin","Pontianak","Manado","Padang","Aceh","Bogor","Serang","Cilegon","Tasikmalaya","Cimahi","Balikpapan","Samarinda","Bandar Lampung","Jambi","Mataram","Kupang","Ambon","Jayapura","Sorong","Ternate","Kendari","Palu","Gorontalo","Bengkulu","Pangkal Pinang","Tanjung Pinang","Dumai","Binjai","Pematangsiantar","Tebing Tinggi","Padang Sidempuan","Gunungsitoli","Langsa","Lhokseumawe","Sabang","Subulussalam","Solok","Sawahlunto","Padang Panjang","Bukittinggi","Payakumbuh","Pariaman","Lubuklinggau","Pagar Alam","Prabumulih","Baturaja","Metro","Banjar","Sukabumi","Cirebon","Purwokerto","Magelang","Salatiga","Klaten","Surakarta","Kediri","Blitar","Madiun","Mojokerto","Pasuruan","Probolinggo","Batu","Jember","Banyuwangi","Situbondo","Bondowoso","Lumajang","Gresik","Lamongan","Tuban","Bojonegoro","Ngawi","Magetan","Ponorogo","Tulungagung","Trenggalek","Pacitan","Sampang","Pamekasan","Sumenep","Bangkalan","Singaraja","Gianyar","Tabanan","Negara","Selong","Bima","Dompu","Maumere","Ende","Ruteng","Waingapu","Atambua","Kefamenanu","Soe","Singkawang","Sambas","Sanggau","Sintang","Putussibau","Palangkaraya","Sampit","Muara Teweh","Kotabaru","Tanjung","Amuntai","Banjarbaru","Martapura","Nunukan","Tarakan","Bontang","Tenggarong","Sendawar","Tolitoli","Buol","Luwuk","Kolaka","Baubau","Raha","Wanggudu","Sofifi","Tidore","Tobelo","Tual","Saumlaki","Fakfak","Manokwari","Biak","Nabire","Wamena","Merauke","Timika"],
-      "Malaysia":  ["Kuala Lumpur","Johor Bahru","Penang","Ipoh","Kota Kinabalu","Kuching","Shah Alam","Petaling Jaya"],
-      "Singapura": ["Singapura"],
-      "Australia": ["Sydney","Melbourne","Brisbane","Perth","Adelaide","Canberra"],
-      "Jepang":    ["Tokyo","Osaka","Kyoto","Yokohama","Nagoya","Sapporo","Fukuoka"],
-      "China":     ["Beijing","Shanghai","Guangzhou","Shenzhen","Chengdu","Hangzhou"],
-      "Amerika Serikat": ["New York","Los Angeles","Chicago","Houston","Phoenix","Philadelphia","San Antonio","San Diego"],
-      "Inggris":   ["London","Manchester","Birmingham","Leeds","Glasgow","Liverpool"],
-    };
-
-    function updateKota() {
-      const negara  = document.getElementById("select-negara").value;
-      const kotaSel = document.getElementById("select-kota");
-      const kota    = kotaMap[negara] || ["Lainnya"];
-      kotaSel.innerHTML = "";
-      kota.forEach(k => {
-        const opt = document.createElement("option");
-        opt.value = k;
-        opt.textContent = k;
-        kotaSel.appendChild(opt);
-      });
+<script>
+  // Sidebar hamburger
+  const hamburger = document.getElementById('hamburger');
+  const sidebar   = document.getElementById('sidebar');
+  hamburger.addEventListener('click', () => sidebar.classList.toggle('show'));
+  document.addEventListener('click', function(e) {
+    if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+      sidebar.classList.remove('show');
     }
+  });
 
-    document.getElementById("input-foto").addEventListener("change", function () {
-      const file = this.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          document.getElementById("preview-foto").src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
+  const kotaMap = {
+    "Indonesia": ["Jakarta","Surabaya","Bandung","Medan","Semarang","Makassar","Palembang","Tangerang","Depok","Bekasi","Yogyakarta","Malang","Denpasar","Batam","Pekanbaru","Banjarmasin","Pontianak","Manado","Padang","Aceh","Bogor","Serang","Cilegon","Tasikmalaya","Cimahi","Balikpapan","Samarinda","Bandar Lampung","Jambi","Mataram","Kupang","Ambon","Jayapura","Sorong","Ternate","Kendari","Palu","Gorontalo","Bengkulu","Pangkal Pinang","Tanjung Pinang","Dumai","Binjai","Pematangsiantar","Tebing Tinggi","Padang Sidempuan","Gunungsitoli","Langsa","Lhokseumawe","Sabang","Subulussalam","Solok","Sawahlunto","Padang Panjang","Bukittinggi","Payakumbuh","Pariaman","Lubuklinggau","Pagar Alam","Prabumulih","Baturaja","Metro","Banjar","Sukabumi","Cirebon","Purwokerto","Magelang","Salatiga","Klaten","Surakarta","Kediri","Blitar","Madiun","Mojokerto","Pasuruan","Probolinggo","Batu","Jember","Banyuwangi","Situbondo","Bondowoso","Lumajang","Gresik","Lamongan","Tuban","Bojonegoro","Ngawi","Magetan","Ponorogo","Tulungagung","Trenggalek","Pacitan","Sampang","Pamekasan","Sumenep","Bangkalan","Singaraja","Gianyar","Tabanan","Negara","Selong","Bima","Dompu","Maumere","Ende","Ruteng","Waingapu","Atambua","Kefamenanu","Soe","Singkawang","Sambas","Sanggau","Sintang","Putussibau","Palangkaraya","Sampit","Muara Teweh","Kotabaru","Tanjung","Amuntai","Banjarbaru","Martapura","Nunukan","Tarakan","Bontang","Tenggarong","Sendawar","Tolitoli","Buol","Luwuk","Kolaka","Baubau","Raha","Wanggudu","Sofifi","Tidore","Tobelo","Tual","Saumlaki","Fakfak","Manokwari","Biak","Nabire","Wamena","Merauke","Timika"],
+    "Malaysia":  ["Kuala Lumpur","Johor Bahru","Penang","Ipoh","Kota Kinabalu","Kuching","Shah Alam","Petaling Jaya"],
+    "Singapura": ["Singapura"],
+    "Australia": ["Sydney","Melbourne","Brisbane","Perth","Adelaide","Canberra"],
+    "Jepang":    ["Tokyo","Osaka","Kyoto","Yokohama","Nagoya","Sapporo","Fukuoka"],
+    "China":     ["Beijing","Shanghai","Guangzhou","Shenzhen","Chengdu","Hangzhou"],
+    "Amerika Serikat": ["New York","Los Angeles","Chicago","Houston","Phoenix","Philadelphia","San Antonio","San Diego"],
+    "Inggris":   ["London","Manchester","Birmingham","Leeds","Glasgow","Liverpool"],
+  };
+
+  function updateKota() {
+    const negara  = document.getElementById("select-negara").value;
+    const kotaSel = document.getElementById("select-kota");
+    const kota    = kotaMap[negara] || ["Lainnya"];
+    kotaSel.innerHTML = "";
+    kota.forEach(k => {
+      const opt = document.createElement("option");
+      opt.value = k;
+      opt.textContent = k;
+      kotaSel.appendChild(opt);
     });
-  </script>
+  }
+
+  document.getElementById("input-foto").addEventListener("change", function () {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        document.getElementById("preview-foto").src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+</script>
 
 </body>
 </html>
